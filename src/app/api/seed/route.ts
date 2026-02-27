@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 
+export const dynamic = 'force-dynamic';
+
 const MOCK_GUIDES = [
     {
         id: "g1",

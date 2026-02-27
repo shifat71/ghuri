@@ -4,6 +4,8 @@ import { GuideCardProps } from "@/components/guide/GuideCard";
 import { Compass } from "lucide-react";
 import { GuideSearchClient } from "./GuideSearchClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function GuidesPage() {
     let guides: GuideCardProps[] = [];
     try {

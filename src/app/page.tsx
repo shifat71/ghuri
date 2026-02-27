@@ -19,6 +19,8 @@ const DESTINATIONS = [
   { id: "saj", name: "Sajek Valley", image: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?q=80&w=400&auto=format&fit=crop" },
 ];
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   let guides: GuideCardProps[] = [];
   try {
