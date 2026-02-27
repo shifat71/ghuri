@@ -27,6 +27,8 @@ Unlike random listings on social media or word-of-mouth referrals, every guide o
 
 > **Our mission:** Build the most trusted travel guide network in South Asia — where every guide is Nogori verified, every experience is authentic, and every traveler feels safe.
 
+> **🤖 FOR DEVELOPERS & AI AGENTS:** We have generated highly detailed step-by-step system architecture and implementation guides. Please read the documentation found in the `/docs` folder before writing any code. Start with the **[AI Build Guide](docs/06-ai-build-guide.md)**.
+
 ---
 
 ## 🛡️ What is Nogori Verification?
@@ -396,7 +398,59 @@ firebase deploy --only hosting
 
 ---
 
-## 🗺️ Roadmap
+## � Page-by-Page Design Documentation (For UI/UX Implementation)
+
+To ensure Ghuri feels strictly like a modern, social-first platform (and not a dated corporate directory), AI agents must implement the following page structures using **Tailwind CSS** and **Shadcn/UI**.
+
+### 1. Home / Explore Page (`/`)
+* **Purpose:** The main discovery feed where users instantly see stunning destinations and verified guides without logging in.
+* **Layout Structure:**
+  * **Top Mobile Nav:** Just the logo, notification bell, and a prominent search bar (Google Maps Autocomplete) saying *"Where to next?"*.
+  * **Hero Section (Desktop):** A clean masonry grid of high-quality travel photos displaying top destinations.
+  * **Horizontal Scroll ("Stori-fied" Categories):** Circular thumbnail buttons (like IG stories) showing generic categories: *"City Tours"*, *"Drone Videography"*, *"Resort Booking"*.
+  * **The "Feed":** A continuous vertical list of **Guide Cards**, instead of small cramped grids.
+* **Guide Card Component:**
+  * Aspect ratio `4/5` (Portrait).
+  * Auto-playing 3-second silent video loop or a swipeable image carousel.
+  * Bottom gradient overlay containing the Guide's Name, Rating (★4.9), and the vibrant Green **🛡️ Nogori Verified** badge.
+
+### 2. Guide Profile Page (`/guides/[id]`)
+* **Purpose:** The freelancer's personal link-in-bio or portfolio page to convert visitors.
+* **Layout Structure:**
+  * **Profile Header:** A round avatar slightly overlapping the Cover Photo. Below it: Name, Tagline (e.g., *"Capturing Sylhet's soul through my lens"*), and Trust Badges.
+  * **Sticky Action Bar:** A floating bottom bar on mobile (or sticky right rail on Desktop) with the persistent primary button: **"Hire Me"** showing the starting price.
+  * **Tab Navigation:**
+    * **Tab 1 - Services:** A clean list of cards. Each card has an icon, title, description, and price (e.g., *Hotel Booking Assist: ৳500/trip*).
+    * **Tab 2 - Portfolio:** A 3-column masonry/Instagram-style grid of square photos. Clicking a photo opens a Shadcn `<Dialog>` lightbox.
+    * **Tab 3 - Reviews:** Simple text blocks with the reviewer's first name, rating, and date.
+
+### 3. The Booking Flap / Modal (`/booking`)
+* **Purpose:** A frictionless, multi-step checkout experience without navigating to an entirely new URL layout.
+* **Layout Structure:**
+  * Opens as a Shadcn **Bottom `<Sheet>`** on mobile, or a centered **Modal `<Dialog>`** on Desktop.
+  * **Step 1 (Dates):** Renders a large, touch-friendly calendar using `react-day-picker` (Shadcn Calendar). Blocked dates must be visually greyed out/crossed out.
+  * **Step 2 (Services):** A checklist of the guide's offered services. As the user checks them, a floating total price updates dynamically.
+  * **Step 3 (Details):** Form fields for *Group Size* and a `<Textarea>` for *Special Requests*.
+  * **Step 4 (Handoff Confirmation):** "Ready! We will instantly connect you with [Guide Name] via WhatsApp to confirm details." (Large CTA button featuring the WhatsApp icon).
+
+### 4. User Dashboard (`/customer/dashboard`)
+* **Purpose:** Where the traveler manages active and past orders, and leaves reviews.
+* **Layout Structure:**
+  * **Header:** "Welcome back, [Name]".
+  * **Tabs:** *Active Trips*, *Past Trips*, *Saved Guides*.
+  * **Trip Card:** Shows order ID, Dates, chosen Guide's avatar, and a hardcoded status pill (e.g., `yellow-100/text-yellow-700` for *Pending*, `green-100` for *Confirmed*).
+  * **Action Button:** "Open in WhatsApp" (deep links back to the active chat).
+
+### 5. Guide Freelancer Dashboard (`/guide/dashboard`)
+* **Purpose:** Core utility for the guide to manage their business inside the app.
+* **Layout Structure:**
+  * **Analytics Row:** 3 solid cards showing: *Profile Views (Last 7 Days)*, *Total Earnings*, *Nogori Score*.
+  * **Manage Services:** A drag-and-drop list (or simple list) where guides can edit prices or toggle a service active/inactive.
+  * **Portfolio Uploader:** A simple dropzone utilizing Firebase Storage to append new images to their public feed.
+
+---
+
+## �🗺️ Roadmap
 
 ### Phase 1 — MVP (Month 1–2)
 - [x] Project setup & Firebase integration
