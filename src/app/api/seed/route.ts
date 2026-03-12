@@ -56,6 +56,33 @@ const MOCK_GUIDES = [
     }
 ];
 
+const MOCK_POSTS = [
+    {
+        id: "p1",
+        guideId: "g1",
+        content: "Just finished an amazing 3-day tour through the tea gardens. The weather was absolutely perfect! 🍃☕",
+        imageUrl: "https://images.unsplash.com/photo-1542459030-77a8bdfd7aa8?q=80&w=1200&auto=format&fit=crop",
+        createdAt: new Date(Date.now() - 86400000), // 1 day ago
+        likes: 24
+    },
+    {
+        id: "p2",
+        guideId: "g1",
+        content: "Looking forward to exploring the Ratargul Swamp Forest tomorrow with a new group. It's the only freshwater swamp forest in Bangladesh! Here's a shot from my last trip.",
+        imageUrl: "https://images.unsplash.com/photo-1513326738677-b9628045e7f2?q=80&w=1200&auto=format&fit=crop",
+        createdAt: new Date(Date.now() - 172800000), // 2 days ago
+        likes: 56
+    },
+    {
+        id: "p3",
+        guideId: "g2",
+        content: "The sunset at Inani beach never gets old. 🌅 Make sure to book my Marine Drive Tour if you want to experience this in person!",
+        imageUrl: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1200&auto=format&fit=crop",
+        createdAt: new Date(Date.now() - 43200000), // 12 hours ago
+        likes: 112
+    }
+];
+
 export async function GET() {
     try {
         console.log("Starting DB seeding...");
@@ -64,6 +91,13 @@ export async function GET() {
             await setDoc(doc(db, "guides", guide.id), guide);
             console.log(`Successfully wrote ${guide.id}`);
         }
+
+        console.log("Seeding guide posts...");
+        for (const post of MOCK_POSTS) {
+            await setDoc(doc(db, "guide_posts", post.id), post);
+            console.log(`Successfully wrote post ${post.id}`);
+        }
+
         console.log("Finished seeding!");
         return NextResponse.json({ message: "Seeding completed successfully" });
     } catch (error: any) {

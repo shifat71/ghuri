@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
-import { Compass, Calendar } from "lucide-react";
+import { Compass, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -56,17 +56,25 @@ export default function CustomerDashboard() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">My Trips</h1>
                     <p className="text-slate-500">Manage your upcoming and past adventures.</p>
                 </div>
-                <Link href="/guides">
-                    <Button className="rounded-xl flex items-center gap-2">
-                        <Compass className="h-4 w-4" />
-                        Find New Guide
-                    </Button>
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard/customer/profile">
+                        <Button variant="outline" className="rounded-xl flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            <span className="hidden sm:inline">Profile</span>
+                        </Button>
+                    </Link>
+                    <Link href="/guides">
+                        <Button className="rounded-xl flex items-center gap-2 bg-teal-600 hover:bg-teal-700">
+                            <Compass className="h-4 w-4" />
+                            Find New Guide
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {isLoadingOrders ? (
@@ -82,8 +90,8 @@ export default function CustomerDashboard() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
-                                                'bg-slate-100 text-slate-800'
+                                        order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
+                                            'bg-slate-100 text-slate-800'
                                         }`}>
                                         {order.status}
                                     </span>

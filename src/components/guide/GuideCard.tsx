@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -49,12 +48,10 @@ export function GuideCard({
 
                 {/* Profile Image / Video */}
                 {(coverUrl || avatarUrl) ? (
-                    <Image
+                    <img
                         src={coverUrl || avatarUrl}
                         alt={`Profile of ${name}`}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                 ) : (
                     <div className="absolute inset-0 bg-slate-200 dark:bg-slate-700 transition-transform duration-700 group-hover:scale-105" />

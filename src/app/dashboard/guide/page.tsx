@@ -6,8 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { collection, query, where, getDocs, doc, getDoc, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, ShieldAlert, Users, TrendingUp } from "lucide-react";
+import { CheckCircle2, ShieldAlert, Users, TrendingUp, User, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreatePost } from "@/components/guide/CreatePost";
+import { GuideFeed } from "@/components/guide/GuideFeed";
+import Link from "next/link";
 
 export default function GuideDashboard() {
     const { user, dbUser, loading } = useAuth();
@@ -66,9 +69,25 @@ export default function GuideDashboard() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Guide Dashboard</h1>
-                <p className="text-slate-500">Manage your profile, services, and incoming booking requests.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Guide Dashboard</h1>
+                    <p className="text-slate-500">Manage your profile, services, and incoming booking requests.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Link href={`/guides/${user?.uid}`}>
+                        <Button variant="outline" className="rounded-xl flex items-center gap-2">
+                            <Compass className="h-4 w-4" />
+                            <span className="hidden sm:inline">View Public Profile</span>
+                        </Button>
+                    </Link>
+                    <Link href={`/guides/${user?.uid}`}>
+                        <Button className="rounded-xl flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white">
+                            <User className="h-4 w-4" />
+                            My Profile
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {/* Verification Warning */}
@@ -113,6 +132,16 @@ export default function GuideDashboard() {
                 </Card>
             </div>
 
+            {/* Create Post & Feed Section */}
+            <div className="mb-8">
+                <h2 className="text-xl font-bold tracking-tight mb-4">Your Feed</h2>
+                <GuideFeed
+                    guideId={user?.uid || ""}
+                    guideAvatar={guideProfile?.avatarUrl || dbUser?.photoURL || user?.photoURL || ""}
+                    guideName={guideProfile?.name || dbUser?.displayName || user?.displayName || "Guide"}
+                />
+            </div>
+
             {/* Recent Activity */}
             <h2 className="text-xl font-bold mb-4">Incoming Requests</h2>
             {orders.length > 0 ? (
@@ -122,8 +151,8 @@ export default function GuideDashboard() {
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
-                                                'bg-slate-100 text-slate-800'
+                                        order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
+                                            'bg-slate-100 text-slate-800'
                                         }`}>
                                         {order.status}
                                     </span>

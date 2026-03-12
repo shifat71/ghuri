@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
+
 
 export function NavbarClient() {
     const { user, dbUser, logout } = useAuth();
@@ -63,7 +63,7 @@ export function NavbarClient() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="rounded-full overflow-hidden border relative">
                                     {user.photoURL ? (
-                                        <Image src={user.photoURL} alt="Avatar" width={32} height={32} className="object-cover" />
+                                        <img src={user.photoURL} alt="Avatar" width={32} height={32} className="object-cover rounded-full" />
                                     ) : (
                                         <UserCircle className="h-6 w-6 text-slate-600" />
                                     )}
