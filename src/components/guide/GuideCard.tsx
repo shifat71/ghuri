@@ -48,13 +48,17 @@ export function GuideCard({
                 </button>
 
                 {/* Profile Image / Video */}
-                <Image
-                    src={coverUrl || avatarUrl}
-                    alt={`Profile of ${name}`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+                {(coverUrl || avatarUrl) ? (
+                    <Image
+                        src={coverUrl || avatarUrl}
+                        alt={`Profile of ${name}`}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-slate-200 dark:bg-slate-700 transition-transform duration-700 group-hover:scale-105" />
+                )}
 
                 {/* Bottom Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {
     User,
+    UserCredential,
     GoogleAuthProvider,
     signInWithPopup,
     signOut,
@@ -23,7 +24,7 @@ interface AuthContextType {
     user: User | null;
     dbUser: DbUser | null;
     loading: boolean;
-    signInWithGoogle: () => Promise<void>;
+    signInWithGoogle: () => Promise<UserCredential>;
     logout: () => Promise<void>;
 }
 
@@ -31,7 +32,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     dbUser: null,
     loading: true,
-    signInWithGoogle: async () => { },
+    signInWithGoogle: async () => { throw new Error("AuthContext not initialized"); },
     logout: async () => { },
 });
 
@@ -69,9 +70,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithPopup(auth, provider);
+            return await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google", error);
+            throw error;
         }
     };
 

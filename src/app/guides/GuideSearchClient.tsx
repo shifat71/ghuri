@@ -14,11 +14,11 @@ export function GuideSearchClient({ initialGuides }: { initialGuides: GuideCardP
 
     const filteredGuides = useMemo(() => {
         return initialGuides.filter((guide) => {
-            const matchesSearch = guide.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            const matchesSearch = (guide.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
                 (guide.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
                 (guide.services?.some(s => s.title.toLowerCase().includes(searchQuery.toLowerCase())) ?? false);
 
-            const matchesLocation = locationFilter === "" || locationFilter === "All" ? true : guide.locations.includes(locationFilter);
+            const matchesLocation = locationFilter === "" || locationFilter === "All" ? true : (guide.locations?.includes(locationFilter) ?? false);
 
             return matchesSearch && matchesLocation;
         });

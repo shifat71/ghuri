@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase/config";
+import { auth, db } from "@/lib/firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 
@@ -41,15 +42,38 @@ export function AuthModal({ trigger, defaultTab = 'signin' }: AuthModalProps) {
     const [signUpEmail, setSignUpEmail] = useState("");
     const [signUpPassword, setSignUpPassword] = useState("");
 
+    const handleAuthSuccess = async (uid: string) => {
+        try {
+            const userDoc = await getDoc(doc(db, "users", uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.role) {
+                    router.push(`/dashboard/${userData.role}`);
+                } else {
+                    router.push('/onboarding');
+                }
+            } else {
+                router.push('/onboarding');
+            }
+        } catch (error) {
+            console.error("Error checking user document:", error);
+            router.push('/onboarding'); // Fallback to onboarding on error
+        }
+
+        setTimeout(() => {
+            setIsOpen(false);
+            setIsSubmitting(false);
+        }, 500);
+    }
+
     const handleGoogleSignIn = async () => {
         setIsSubmitting(true);
         setErrorMsg("");
         try {
-            await signInWithGoogle();
-            setTimeout(() => {
-                setIsOpen(false);
-                setIsSubmitting(false);
-            }, 500);
+            const result = await signInWithGoogle();
+            if (result && result.user) {
+                await handleAuthSuccess(result.user.uid);
+            }
         } catch (error: any) {
             setErrorMsg(error.message || "Failed to sign in with Google");
             setIsSubmitting(false);
@@ -62,11 +86,8 @@ export function AuthModal({ trigger, defaultTab = 'signin' }: AuthModalProps) {
         setErrorMsg("");
 
         try {
-            await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
-            setTimeout(() => {
-                setIsOpen(false);
-                setIsSubmitting(false);
-            }, 500);
+            const result = await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
+            await handleAuthSuccess(result.user.uid);
         } catch (error: any) {
             setErrorMsg("Invalid email or password. Please try again.");
             setIsSubmitting(false);
@@ -91,10 +112,7 @@ export function AuthModal({ trigger, defaultTab = 'signin' }: AuthModalProps) {
                 displayName: signUpName
             });
 
-            setTimeout(() => {
-                setIsOpen(false);
-                setIsSubmitting(false);
-            }, 500);
+            await handleAuthSuccess(userCredential.user.uid);
         } catch (error: any) {
             setErrorMsg(error.message || "Failed to create account");
             setIsSubmitting(false);
