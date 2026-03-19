@@ -75,18 +75,25 @@ export default function GuideDashboard() {
                     <p className="text-slate-500">Manage your profile, services, and incoming booking requests.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Link href={`/guides/${user?.uid}`}>
-                        <Button variant="outline" className="rounded-xl flex items-center gap-2">
-                            <Compass className="h-4 w-4" />
-                            <span className="hidden sm:inline">View Public Profile</span>
-                        </Button>
-                    </Link>
-                    <Link href={`/guides/${user?.uid}`}>
-                        <Button className="rounded-xl flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white">
-                            <User className="h-4 w-4" />
-                            My Profile
-                        </Button>
-                    </Link>
+                    <Button 
+                        variant="outline" 
+                        className="rounded-xl flex items-center gap-2"
+                        onClick={() => {
+                            if (user?.uid) router.push(`/guides/${user.uid}`);
+                        }}
+                    >
+                        <Compass className="h-4 w-4" />
+                        <span className="hidden sm:inline">View Public Profile</span>
+                    </Button>
+                    <Button 
+                        className="rounded-xl flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white"
+                        onClick={() => {
+                            if (user?.uid) router.push(`/guides/${user.uid}`);
+                        }}
+                    >
+                        <User className="h-4 w-4" />
+                        My Profile
+                    </Button>
                 </div>
             </div>
 

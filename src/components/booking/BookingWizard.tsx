@@ -140,6 +140,15 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                                     onSelect={(range: any) => setDateRange(range)}
                                     numberOfMonths={1}
                                     className="bg-transparent"
+                                    disabled={(date) => {
+                                        // Block past dates
+                                        if (date < new Date(new Date().setHours(0,0,0,0))) return true;
+                                        
+                                        // Block dates NOT in guide's available dates
+                                        const isoDate = date.toISOString().split('T')[0];
+                                        const isAvailable = (guide.availableDates || guide.unavailableDates || []).some((d: string) => d.startsWith(isoDate));
+                                        return !isAvailable;
+                                    }}
                                 />
                             </div>
                         </div>
