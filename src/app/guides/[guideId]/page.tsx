@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
-import { Star, CheckCircle, MapPin, CalendarDays, Camera, Compass, Share, Pencil, X, Check, Plus, Trash2, ImagePlus, Languages } from "lucide-react";
+import { Star, CheckCircle, MapPin, CalendarDays, Camera, Compass, Share, Pencil, X, Check, Plus, Trash2, ImagePlus, Languages, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,8 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { GuideFeed } from "@/components/guide/GuideFeed";
+import { Calendar } from "@/components/ui/calendar";
+import dynamic from "next/dynamic";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
+// Dynamically import map with SSR disabled
+const GuidePublicMap = dynamic(
+    () => import("@/components/maps/GuidePublicMap"),
+    { 
+        ssr: false,
+        loading: () => <div className="h-[350px] w-full bg-slate-100 dark:bg-slate-800 animate-pulse rounded-3xl flex items-center justify-center font-bold text-slate-400 text-xs">Loading Map...</div>
+    }
+);
 import { updateProfile } from "firebase/auth";
 import { db, storage } from "@/lib/firebase/config";
 import { useAuth } from "@/contexts/AuthContext";
@@ -402,6 +413,65 @@ export default function GuideProfilePage({ params }: { params: Promise<{ guideId
                         </div>
                     </div>
 
+                    {/* Locations & Availability Section */}
+                    {((guide.spots && guide.spots.length > 0) || (guide.unavailableDates && guide.unavailableDates.length > 0)) && (
+                        <div className="mt-8 border-t border-slate-100 dark:border-slate-700 pt-8">
+                            <div className="flex flex-col lg:flex-row gap-8">
+                                {/* Map Column */}
+                                {guide.spots && guide.spots.length > 0 && (
+                                    <div className="flex-1 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-lg">
+                                                <Navigation className="h-5 w-5 text-indigo-600" />
+                                                Service Locations
+                                            </h3>
+                                            <Badge variant="outline" className="rounded-lg text-[10px] uppercase font-bold text-slate-400">
+                                                {guide.spots.length} Spots Marked
+                                            </Badge>
+                                        </div>
+                                        
+                                        {/* Textual list of spots */}
+                                        <div className="flex flex-wrap gap-2 pb-2">
+                                            {guide.spots.map((spot: any, i: number) => (
+                                                <div key={i} className="flex items-center gap-2 bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 px-3 py-1.5 rounded-xl shadow-sm">
+                                                    <div className="h-2 w-2 rounded-full bg-indigo-500 shrink-0" />
+                                                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 truncate max-w-[150px]">
+                                                        {spot.label.split(',')[0]}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <GuidePublicMap spots={guide.spots} />
+                                    </div>
+                                )}
+
+                                {/* Availability Column */}
+                                {guide.availableDates && guide.availableDates.length > 0 && (
+                                    <div className="w-full lg:w-fit space-y-4">
+                                        <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-lg">
+                                            <CalendarDays className="h-5 w-5 text-teal-500" />
+                                            Available Dates
+                                        </h3>
+                                        <div className="bg-white dark:bg-slate-950 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                                            <Calendar
+                                                mode="multiple"
+                                                selected={(guide.availableDates || []).map((d: string) => new Date(d))}
+                                                className="p-0 pointer-events-none"
+                                                classNames={{
+                                                    selected: "bg-teal-50 text-teal-600 font-bold border-2 border-teal-200 rounded-xl",
+                                                }}
+                                            />
+                                            <div className="mt-4 flex items-center gap-2 px-2">
+                                                <div className="h-3 w-3 rounded-full bg-teal-100 border-2 border-teal-300" />
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Guide is Available</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Modular Profile Tabs */}
