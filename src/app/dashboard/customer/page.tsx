@@ -13,6 +13,7 @@ import {
     MapPin, Star, TrendingUp, CreditCard, ChevronRight, MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Loader2, Calendar, CheckCircle2, Compass, Heart, TrendingUp, MapPin, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getNidBadge, type NidStatus } from "@/lib/verification";
 

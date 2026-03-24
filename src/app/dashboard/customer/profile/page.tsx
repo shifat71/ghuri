@@ -1,176 +1,129 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { updateProfile } from "firebase/auth";
 import { db } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft, User, Phone, Image as ImageIcon } from "lucide-react";
-import Link from "next/link";
+import { Loader2, User, Phone, MapPin, Save, CheckCircle2 } from "lucide-react";
 
-export default function CustomerProfileSettings() {
-    const { user, dbUser, loading } = useAuth();
-    const router = useRouter();
+const TRAVEL_PREFS = ["Beach", "Hill & Trekking", "Cultural", "Food Tour", "Photography", "Wildlife", "City Tour", "Adventure"];
 
-    const [name, setName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [photoUrl, setPhotoUrl] = useState("");
-
+export default function CustomerProfilePage() {
+    const { user, loading } = useAuth();
+    const [displayName, setDisplayName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [location, setLocation] = useState("");
+    const [preferences, setPreferences] = useState<string[]>([]);
     const [isSaving, setIsSaving] = useState(false);
-    const [message, setMessage] = useState({ text: "", type: "" });
+    const [saved, setSaved] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Auth Guard & Pre-fill
     useEffect(() => {
-        if (!loading) {
-            if (!user) router.push("/");
-            else if (dbUser && dbUser.role !== "customer") router.push(`/dashboard/${dbUser.role}`);
-            else if (dbUser) {
-                setName(dbUser.displayName || user.displayName || "");
-                setPhone(dbUser.phoneNumber || "");
-                setPhotoUrl(dbUser.photoURL || user.photoURL || "");
-            }
-        }
-    }, [user, dbUser, loading, router]);
+        const fetchProfile = async () => {
+            if (!user?.uid) return;
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    setDisplayName(data.displayName || user.displayName || "");
+                    setPhoneNumber(data.phoneNumber || "");
+                    setLocation(data.location || "");
+                    setPreferences(data.travelPreferences || []);
+                }
+            } catch (err) { console.error(err); }
+            finally { setIsLoading(false); }
+        };
+        if (user) fetchProfile();
+    }, [user]);
 
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-
-        setIsSaving(true);
-        setMessage({ text: "", type: "" });
-
-        try {
-            // Update Auth Profile
-            await updateProfile(user, {
-                displayName: name,
-                photoURL: photoUrl
-            });
-
-            // Update Firestore Profile
-            await updateDoc(doc(db, "users", user.uid), {
-                displayName: name,
-                phoneNumber: phone,
-                photoURL: photoUrl
-            });
-
-            setMessage({ text: "Profile updated successfully!", type: "success" });
-
-            // Clear success message after 3 seconds
-            setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-
-            // Force reload to update AuthContext UI everywhere
-            window.location.reload();
-
-        } catch (error: any) {
-            console.error("Error updating profile:", error);
-            setMessage({ text: error.message || "Failed to update profile", type: "error" });
-        } finally {
-            setIsSaving(false);
-        }
+    const togglePref = (pref: string) => {
+        setPreferences(prev => prev.includes(pref) ? prev.filter(p => p !== pref) : [...prev, pref]);
     };
 
-    if (loading || !user || dbUser?.role !== "customer") return null;
+    const handleSave = async () => {
+        if (!user?.uid) return;
+        setIsSaving(true);
+        try {
+            await updateDoc(doc(db, "users", user.uid), { displayName, phoneNumber, location, travelPreferences: preferences, updatedAt: new Date() });
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (err) { console.error(err); }
+        finally { setIsSaving(false); }
+    };
+
+    if (loading || isLoading) return <div className="flex justify-center p-24"><Loader2 className="h-8 w-8 animate-spin text-teal-600" /></div>;
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-3xl">
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/dashboard/customer">
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
+        <div className="max-w-2xl space-y-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Profile Settings</h1>
+                <p className="text-slate-500">Manage your personal information and travel preferences.</p>
+            </div>
+
+            {/* Avatar */}
+            <div className="flex items-center gap-5">
+                <div className="h-20 w-20 rounded-3xl bg-teal-600 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-teal-600/30">
+                    {user?.photoURL
+                        ? <img src={user.photoURL} alt="avatar" className="h-full w-full object-cover rounded-3xl" />
+                        : (displayName || user?.email || "U")[0].toUpperCase()
+                    }
+                </div>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Profile Settings</h1>
-                    <p className="text-slate-500">Manage your personal information.</p>
+                    <p className="font-black text-lg">{displayName || user?.email}</p>
+                    <p className="text-sm text-slate-500">{user?.email}</p>
                 </div>
             </div>
 
-            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
-
-                {/* Current Avatar Preview */}
-                <div className="flex flex-col items-center mb-8">
-                    <div className="h-24 w-24 rounded-full bg-slate-100 overflow-hidden relative mb-4 border-2 border-slate-200">
-                        {photoUrl ? (
-                            <img src={photoUrl} alt="Avatar" className="h-full w-full object-cover" />
-                        ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-teal-50 text-teal-600">
-                                <User className="h-10 w-10" />
+            <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                <div className="space-y-4">
+                    <h3 className="font-bold text-slate-500 text-xs uppercase tracking-wider">Personal Information</h3>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Full Name</label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input value={displayName} onChange={e => setDisplayName(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="Your full name" />
                             </div>
-                        )}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone Number</label>
+                            <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="+880..." />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Your City</label>
+                            <div className="relative">
+                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input value={location} onChange={e => setLocation(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="Dhaka, Chittagong..." />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <form onSubmit={handleSave} className="flex flex-col gap-6">
-
-                    {message.text && (
-                        <div className={`p-4 rounded-xl text-sm font-medium text-center ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                            {message.text}
-                        </div>
-                    )}
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="name" className="text-slate-700">Display Name <span className="text-red-500">*</span></Label>
-                        <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                            <Input
-                                id="name"
-                                required
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="pl-10 h-12 bg-slate-50 rounded-xl"
-                                placeholder="Your full name"
-                            />
-                        </div>
+                <div>
+                    <h3 className="font-bold text-slate-500 text-xs uppercase tracking-wider mb-3">Travel Preferences</h3>
+                    <p className="text-sm text-slate-500 mb-4">Help us recommend the right guides for you.</p>
+                    <div className="flex flex-wrap gap-2">
+                        {TRAVEL_PREFS.map(pref => (
+                            <button key={pref} onClick={() => togglePref(pref)}
+                                className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${preferences.includes(pref)
+                                    ? 'bg-teal-600 text-white border-teal-600 shadow-sm shadow-teal-600/20'
+                                    : 'bg-white dark:bg-slate-900 text-slate-600 border-slate-200 dark:border-slate-700 hover:border-teal-400'}`}>
+                                {pref}
+                            </button>
+                        ))}
                     </div>
+                </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="phone" className="text-slate-700">Phone Number</Label>
-                        <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                            <Input
-                                id="phone"
-                                type="tel"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className="pl-10 h-12 bg-slate-50 rounded-xl"
-                                placeholder="+880 1..."
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="photo" className="text-slate-700">Profile Picture URL</Label>
-                        <div className="relative">
-                            <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                            <Input
-                                id="photo"
-                                type="url"
-                                value={photoUrl}
-                                onChange={(e) => setPhotoUrl(e.target.value)}
-                                className="pl-10 h-12 bg-slate-50 rounded-xl"
-                                placeholder="https://..."
-                            />
-                        </div>
-                        <p className="text-xs text-slate-500">Leave blank to use an auto-generated avatar.</p>
-                    </div>
-
-                    <div className="pt-4 mt-2 border-t border-slate-100 flex justify-end">
-                        <Button
-                            type="submit"
-                            disabled={isSaving || !name.trim()}
-                            className="w-full md:w-auto min-w-[140px] h-12 rounded-xl bg-teal-600 hover:bg-teal-700 font-bold"
-                        >
-                            {isSaving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : "Save Changes"}
-                        </Button>
-                    </div>
-
-                </form>
+                <Button onClick={handleSave} disabled={isSaving} className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-md shadow-teal-600/20">
+                    {isSaving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : saved ? <CheckCircle2 className="h-5 w-5 mr-2" /> : <Save className="h-5 w-5 mr-2" />}
+                    {saved ? 'Saved!' : 'Save Profile'}
+                </Button>
             </Card>
         </div>
     );

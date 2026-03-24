@@ -1,0 +1,57 @@
+﻿
+> ghuri@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 7.6s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/30) ...
+  Generating static pages using 11 workers (7/30) 
+  Generating static pages using 11 workers (14/30) 
+  Generating static pages using 11 workers (22/30) 
+Γ£ô Generating static pages using 11 workers (30/30) in 607.8ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/book
+Γö£ ╞Æ /api/checkout
+Γö£ ╞Æ /api/seed
+Γö£ Γùï /dashboard/admin
+Γö£ Γùï /dashboard/admin/bookings
+Γö£ Γùï /dashboard/admin/guides
+Γö£ Γùï /dashboard/admin/locations
+Γö£ Γùï /dashboard/admin/payouts
+Γö£ Γùï /dashboard/admin/reviews
+Γö£ Γùï /dashboard/admin/settings
+Γö£ Γùï /dashboard/customer
+Γö£ Γùï /dashboard/customer/explore
+Γö£ Γùï /dashboard/customer/messages
+Γö£ Γùï /dashboard/customer/notifications
+Γö£ Γùï /dashboard/customer/profile
+Γö£ Γùï /dashboard/customer/trips
+Γö£ Γùï /dashboard/customer/wishlist
+Γö£ Γùï /dashboard/guide
+Γö£ Γùï /dashboard/guide/bookings
+Γö£ Γùï /dashboard/guide/calendar
+Γö£ Γùï /dashboard/guide/earnings
+Γö£ Γùï /dashboard/guide/notifications
+Γö£ Γùï /dashboard/guide/profile
+Γö£ Γùï /dashboard/guide/reviews
+Γö£ Γùï /dashboard/guide/services
+Γö£ Γùï /destinations
+Γö£ Γùï /dev/seed-admin
+Γö£ ╞Æ /guides
+Γö£ ╞Æ /guides/[guideId]
+Γöö Γùï /onboarding
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
+
