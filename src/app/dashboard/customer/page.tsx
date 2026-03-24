@@ -1,128 +1,408 @@
 "use client";
 
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useOrders } from "@/hooks/useOrders";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    Compass, Calendar, User, ShieldCheck, Upload, CheckCircle, Clock, XCircle,
+    MapPin, Star, TrendingUp, CreditCard, ChevronRight, MessageSquare
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Calendar, CheckCircle2, Compass, Heart, TrendingUp, MapPin, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { getNidBadge, type NidStatus } from "@/lib/verification";
 
-const FEATURED_DESTINATIONS = [
-    { name: "Sylhet", label: "Tea Gardens & Hills", seed: "sylhet", color: "from-emerald-600 to-emerald-900" },
-    { name: "Cox's Bazar", label: "World's Longest Beach", seed: "coxsbazar", color: "from-blue-600 to-blue-900" },
-    { name: "Sundarbans", label: "Royal Bengal Tiger", seed: "sundarbans", color: "from-teal-700 to-teal-900" },
-    { name: "Bandarban", label: "Hill Tracts & Waterfalls", seed: "bandarban", color: "from-indigo-600 to-indigo-900" },
-];
-
-export default function CustomerOverviewPage() {
+export default function CustomerDashboard() {
     const { user, dbUser, loading } = useAuth();
-    const { orders, loading: ordersLoading } = useOrders('customer');
+    const router = useRouter();
+    const [orders, setOrders] = useState<any[]>([]);
+    const [guidesMap, setGuidesMap] = useState<Record<string, any>>({});
+    const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
-    if (loading || !user) {
-        return <div className="flex justify-center p-24"><Loader2 className="h-8 w-8 animate-spin text-teal-600" /></div>;
-    }
+    // NID Upload State
+    const [nidFile, setNidFile] = useState<File | null>(null);
+    const [nidPreview, setNidPreview] = useState<string | null>(null);
+    const [isUploadingNid, setIsUploadingNid] = useState(false);
+    const [nidUploadSuccess, setNidUploadSuccess] = useState(false);
+    const nidInputRef = useRef<HTMLInputElement>(null);
 
-    const upcoming = orders.filter(o => o.status === 'pending' || o.status === 'confirmed');
-    const completed = orders.filter(o => o.status === 'completed');
+    const nidStatus = (dbUser?.nidStatus || "not_submitted") as NidStatus;
+
+    // Auth Guard
+    useEffect(() => {
+        if (!loading) {
+            if (!user) router.push("/");
+            else if (dbUser && dbUser.role !== "customer") router.push(`/dashboard/${dbUser.role}`);
+        }
+    }, [user, dbUser, loading, router]);
+
+    // Fetch Orders + Guide details
+    useEffect(() => {
+        const fetchOrders = async () => {
+            if (!user) return;
+            try {
+                const q = query(
+                    collection(db, "orders"),
+                    where("customerId", "==", user.uid),
+                    orderBy("createdAt", "desc")
+                );
+                const snapshot = await getDocs(q);
+                const ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                setOrders(ordersData);
+
+                // Fetch guide details for each unique guideId
+                const guideIds = [...new Set(ordersData.map((o: any) => o.guideId).filter(Boolean))];
+                const guidesData: Record<string, any> = {};
+                for (const gid of guideIds) {
+                    try {
+                        const guideDoc = await getDoc(doc(db, "guides", gid));
+                        if (guideDoc.exists()) {
+                            guidesData[gid] = guideDoc.data();
+                        }
+                    } catch { /* ignore */ }
+                }
+                setGuidesMap(guidesData);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            } finally {
+                setIsLoadingOrders(false);
+            }
+        };
+
+        if (user && dbUser?.role === "customer") fetchOrders();
+    }, [user, dbUser]);
+
+    const handleNidFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert("File size must be under 5MB"); return; }
+        setNidFile(file);
+        setNidPreview(URL.createObjectURL(file));
+    };
+
+    const handleNidUpload = async () => {
+        if (!user || !nidFile) return;
+        setIsUploadingNid(true);
+        try {
+            const storageRef = ref(storage, `verification/${user.uid}/nid_${Date.now()}`);
+            await uploadBytes(storageRef, nidFile);
+            const nidUrl = await getDownloadURL(storageRef);
+            await updateDoc(doc(db, "users", user.uid), { nidUrl, nidStatus: "submitted", updatedAt: serverTimestamp() });
+            setNidUploadSuccess(true);
+            setNidFile(null);
+            setNidPreview(null);
+        } catch (error) {
+            console.error("Error uploading NID:", error);
+            alert("Failed to upload NID. Please try again.");
+        } finally {
+            setIsUploadingNid(false);
+        }
+    };
+
+    if (loading || dbUser?.role !== "customer") return null;
+
+    // Derived stats
+    const pendingOrders = orders.filter(o => o.status === "pending");
+    const confirmedOrders = orders.filter(o => o.status === "confirmed");
+    const completedOrders = orders.filter(o => o.status === "completed");
+    const cancelledOrders = orders.filter(o => o.status === "cancelled");
+    const totalSpent = orders
+        .filter(o => o.status === "completed" || o.status === "confirmed")
+        .reduce((sum, o) => sum + (o.totalAmount || o.totalPrice || 0), 0);
+
+    const formatDate = (ts: any) => {
+        if (!ts) return "TBD";
+        try {
+            const d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        } catch { return "TBD"; }
+    };
+
+    const getStatusStyle = (status: string) => {
+        switch (status) {
+            case "pending": return "bg-amber-100 text-amber-800";
+            case "confirmed": return "bg-blue-100 text-blue-800";
+            case "completed": return "bg-emerald-100 text-emerald-800";
+            case "cancelled": return "bg-red-100 text-red-800";
+            default: return "bg-slate-100 text-slate-800";
+        }
+    };
+
+    const OrderCard = ({ order }: { order: any }) => {
+        const guide = guidesMap[order.guideId];
+        return (
+            <Card className="rounded-2xl border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
+                <div className="p-5">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-3">
+                            {guide?.avatarUrl ? (
+                                <img src={guide.avatarUrl} alt={guide.name} className="h-10 w-10 rounded-xl object-cover" />
+                            ) : (
+                                <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 font-bold">
+                                    {guide?.name?.charAt(0) || "G"}
+                                </div>
+                            )}
+                            <div>
+                                <h3 className="font-bold text-slate-900 dark:text-white">
+                                    {order.title || `Trip with ${guide?.name || "Guide"}`}
+                                </h3>
+                                <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                                    {guide?.locations?.[0] && (
+                                        <span className="flex items-center gap-0.5">
+                                            <MapPin className="h-3 w-3" />
+                                            {guide.locations[0]}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${getStatusStyle(order.status)}`}>
+                            {order.status}
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 py-3 border-y border-slate-100 dark:border-slate-800">
+                        <div>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Dates</p>
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
+                                {formatDate(order.dates?.from || order.startDate)}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Group</p>
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
+                                {order.travelerDetails?.groupSize || order.groupSize || 1} person{(order.travelerDetails?.groupSize || order.groupSize || 1) > 1 ? "s" : ""}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Total</p>
+                            <p className="text-sm font-bold text-teal-600 mt-0.5">
+                                ৳{(order.totalAmount || order.totalPrice || 0).toLocaleString()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-3">
+                        <div className="flex gap-2">
+                            {order.status === "confirmed" && (
+                                <Button size="sm" className="rounded-lg bg-[#25D366] hover:bg-[#1DA851] text-white text-xs h-8 gap-1">
+                                    <MessageSquare className="h-3 w-3" />
+                                    WhatsApp
+                                </Button>
+                            )}
+                        </div>
+                        <Link href={`/guides/${order.guideId}`}>
+                            <Button variant="ghost" size="sm" className="rounded-lg text-xs text-slate-500 h-8 gap-1">
+                                View Guide <ChevronRight className="h-3 w-3" />
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </Card>
+        );
+    };
 
     return (
-        <div className="space-y-8 max-w-5xl">
-            {/* Welcome Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-teal-950 p-8 md:p-10 text-white shadow-2xl">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-teal-400/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-                <div className="relative z-10">
-                    <p className="text-teal-400 font-bold uppercase tracking-widest text-sm mb-2">Welcome back</p>
-                    <h1 className="text-3xl md:text-4xl font-black mb-3">
-                        {user.displayName?.split(" ")[0] || "Explorer"} 👋
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-1">
+                        Welcome back, {dbUser?.displayName?.split(" ")[0] || "Traveler"}
                     </h1>
-                    <p className="text-slate-300 mb-6 max-w-lg">
-                        Ready for your next adventure? Browse verified local guides across Bangladesh or manage your existing trips.
-                    </p>
-                    <Link href="/dashboard/customer/explore">
-                        <Button className="bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl px-6 flex items-center gap-2">
-                            <Compass className="h-5 w-5" /> Explore Guides <ArrowRight className="h-4 w-4" />
+                    <p className="text-slate-500">Your travel dashboard at a glance.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard/customer/profile">
+                        <Button variant="outline" className="rounded-xl flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            <span className="hidden sm:inline">Profile</span>
+                        </Button>
+                    </Link>
+                    <Link href="/guides">
+                        <Button className="rounded-xl flex items-center gap-2 bg-teal-600 hover:bg-teal-700">
+                            <Compass className="h-4 w-4" />
+                            Find Guide
                         </Button>
                     </Link>
                 </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                    { label: "Upcoming", value: upcoming.length, icon: Calendar, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/40" },
-                    { label: "Completed", value: completed.length, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
-                    { label: "Total Trips", value: orders.length, icon: MapPin, color: "text-teal-600", bg: "bg-teal-50 dark:bg-teal-950/40" },
-                    { label: "Destinations", value: [...new Set(orders.map(o => o.destination).filter(Boolean))].length, icon: TrendingUp, color: "text-indigo-600", bg: "bg-indigo-50 dark:bg-indigo-950/40" },
-                ].map((stat) => (
-                    <Card key={stat.label} className="p-5 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-3">
-                        <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
-                            <stat.icon className={`h-5 w-5 ${stat.color}`} />
+            {/* NID Verification Banner */}
+            {nidStatus === "verified" ? (
+                <div className="mb-6 p-3.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
+                    <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">NID verified — you can book any guide.</p>
+                </div>
+            ) : nidStatus === "submitted" || nidUploadSuccess ? (
+                <div className="mb-6 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-blue-600 shrink-0" />
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-300">NID under review — you can browse while we verify.</p>
+                </div>
+            ) : nidStatus === "rejected" ? (
+                <Card className="mb-6 p-5 rounded-2xl border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
+                    <div className="flex items-start gap-3 mb-3">
+                        <XCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+                        <div>
+                            <p className="text-sm font-semibold text-red-800 dark:text-red-300">NID rejected — please re-upload a clear photo.</p>
+                        </div>
+                    </div>
+                    <input ref={nidInputRef} type="file" accept="image/*" onChange={handleNidFileSelect} className="hidden" />
+                    {nidPreview ? (
+                        <div className="space-y-3">
+                            <img src={nidPreview} alt="NID preview" className="w-full max-h-40 object-contain rounded-xl border border-slate-200 bg-white" />
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={() => { setNidFile(null); setNidPreview(null); }} className="rounded-lg">Remove</Button>
+                                <Button size="sm" onClick={handleNidUpload} disabled={isUploadingNid} className="rounded-lg bg-teal-600 hover:bg-teal-700">
+                                    {isUploadingNid ? "Uploading..." : "Re-submit NID"}
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <Button variant="outline" size="sm" onClick={() => nidInputRef.current?.click()} className="rounded-xl">
+                            <Upload className="h-4 w-4 mr-2" /> Upload NID Again
+                        </Button>
+                    )}
+                </Card>
+            ) : (
+                <Card className="mb-6 p-5 rounded-2xl border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
+                    <div className="flex items-start gap-3 mb-3">
+                        <ShieldCheck className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Verify your NID to book guides</h3>
+                            <p className="text-xs text-slate-500 mt-0.5">One-time verification keeps the community safe.</p>
+                        </div>
+                    </div>
+                    <input ref={nidInputRef} type="file" accept="image/*" onChange={handleNidFileSelect} className="hidden" />
+                    {nidPreview ? (
+                        <div className="space-y-3">
+                            <img src={nidPreview} alt="NID preview" className="w-full max-h-40 object-contain rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={() => { setNidFile(null); setNidPreview(null); }} className="rounded-lg">Remove</Button>
+                                <Button size="sm" onClick={handleNidUpload} disabled={isUploadingNid} className="rounded-lg bg-teal-600 hover:bg-teal-700">
+                                    {isUploadingNid ? "Uploading..." : "Submit NID"}
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button onClick={() => nidInputRef.current?.click()} className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl hover:border-teal-400 transition-colors cursor-pointer">
+                            <Upload className="h-4 w-4 text-slate-400" />
+                            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Upload NID card</span>
+                        </button>
+                    )}
+                </Card>
+            )}
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                            <Calendar className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                            <p className="text-2xl font-black">{ordersLoading ? '—' : stat.value}</p>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{stat.label}</p>
+                            <p className="text-xs text-slate-500 font-medium">Total Trips</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">{orders.length}</p>
                         </div>
-                    </Card>
-                ))}
+                    </div>
+                </Card>
+                <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
+                            <Clock className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium">Upcoming</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">{pendingOrders.length + confirmedOrders.length}</p>
+                        </div>
+                    </div>
+                </Card>
+                <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium">Completed</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">{completedOrders.length}</p>
+                        </div>
+                    </div>
+                </Card>
+                <Card className="p-4 rounded-2xl border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                            <CreditCard className="h-5 w-5 text-teal-600" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium">Total Spent</p>
+                            <p className="text-xl font-bold text-teal-600">৳{totalSpent.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </Card>
             </div>
 
-            {/* Recent Trips */}
-            <div>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Recent Trips</h2>
-                    <Link href="/dashboard/customer/trips">
-                        <Button variant="ghost" size="sm" className="text-teal-600 font-bold">View All <ArrowRight className="h-4 w-4 ml-1" /></Button>
-                    </Link>
-                </div>
-                {ordersLoading ? (
-                    <div className="space-y-3">{[1,2].map(i => <div key={i} className="h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />)}</div>
-                ) : upcoming.length === 0 ? (
-                    <Card className="p-10 text-center rounded-3xl border-dashed border-slate-200">
-                        <Compass className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                        <p className="font-bold text-slate-700 dark:text-slate-300 mb-1">No upcoming trips</p>
-                        <p className="text-sm text-slate-500 mb-4">Start by exploring our verified guides across Bangladesh.</p>
-                        <Link href="/dashboard/customer/explore">
-                            <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl">Find a Guide</Button>
-                        </Link>
-                    </Card>
-                ) : upcoming.slice(0, 3).map(order => (
-                    <Card key={order.id} className="p-5 rounded-2xl border-slate-200 dark:border-slate-800 mb-3 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-2xl bg-teal-100 flex items-center justify-center shrink-0">
-                                <MapPin className="h-6 w-6 text-teal-700" />
-                            </div>
-                            <div>
-                                <p className="font-bold">{order.destination || `Trip with ${order.guideName}`}</p>
-                                <p className="text-sm text-slate-500">
-                                    {order.startDate?.toDate ? order.startDate.toDate().toLocaleDateString() : 'TBD'} · ৳{order.totalPrice}
-                                </p>
-                            </div>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shrink-0 ${order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                            {order.status}
-                        </span>
-                    </Card>
-                ))}
-            </div>
+            {/* Trips Tabs */}
+            <Tabs defaultValue="all" className="w-full">
+                <TabsList className="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl mb-6 p-1">
+                    <TabsTrigger value="all" className="rounded-lg text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">
+                        All ({orders.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="upcoming" className="rounded-lg text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">
+                        Upcoming ({pendingOrders.length + confirmedOrders.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="completed" className="rounded-lg text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">
+                        Completed ({completedOrders.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="cancelled" className="rounded-lg text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">
+                        Cancelled ({cancelledOrders.length})
+                    </TabsTrigger>
+                </TabsList>
 
-            {/* Featured Destinations */}
-            <div>
-                <h2 className="text-xl font-bold mb-4">Featured Destinations</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {FEATURED_DESTINATIONS.map(dest => (
-                        <Link href={`/dashboard/customer/explore?location=${encodeURIComponent(dest.name)}`} key={dest.name}>
-                            <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-b ${dest.color} p-4 h-32 cursor-pointer group hover:scale-105 transition-transform duration-200`}>
-                                <img src={`https://picsum.photos/seed/${dest.seed}/400/300`} alt={dest.name} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                <div className="absolute bottom-3 left-3 text-white">
-                                    <p className="font-black text-sm">{dest.name}</p>
-                                    <p className="text-xs opacity-80">{dest.label}</p>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
+                {isLoadingOrders ? (
+                    <div className="space-y-4">
+                        {[1, 2, 3].map(i => <div key={i} className="w-full h-36 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />)}
+                    </div>
+                ) : (
+                    <>
+                        <TabsContent value="all" className="mt-0 space-y-4">
+                            {orders.length > 0 ? orders.map(o => <OrderCard key={o.id} order={o} />) : <EmptyState />}
+                        </TabsContent>
+                        <TabsContent value="upcoming" className="mt-0 space-y-4">
+                            {(pendingOrders.length + confirmedOrders.length) > 0
+                                ? [...pendingOrders, ...confirmedOrders].map(o => <OrderCard key={o.id} order={o} />)
+                                : <EmptyState message="No upcoming trips." />}
+                        </TabsContent>
+                        <TabsContent value="completed" className="mt-0 space-y-4">
+                            {completedOrders.length > 0
+                                ? completedOrders.map(o => <OrderCard key={o.id} order={o} />)
+                                : <EmptyState message="No completed trips yet." />}
+                        </TabsContent>
+                        <TabsContent value="cancelled" className="mt-0 space-y-4">
+                            {cancelledOrders.length > 0
+                                ? cancelledOrders.map(o => <OrderCard key={o.id} order={o} />)
+                                : <EmptyState message="No cancelled trips." />}
+                        </TabsContent>
+                    </>
+                )}
+            </Tabs>
+        </div>
+    );
+}
+
+function EmptyState({ message }: { message?: string }) {
+    return (
+        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+            <Compass className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{message || "No trips yet"}</h3>
+            <p className="text-slate-500 text-sm mb-5 max-w-sm mx-auto">Browse our verified local guides to start your next adventure.</p>
+            <Link href="/guides">
+                <Button className="rounded-xl">Explore Guides</Button>
+            </Link>
         </div>
     );
 }

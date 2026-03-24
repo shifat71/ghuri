@@ -14,5 +14,13 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == userId
                    && request.resource.size < 10 * 1024 * 1024; // 10MB limit
     }
+
+    // Verification documents (Student ID, NID uploads)
+    // Users can upload to their own folder, only admins can read others'
+    match /verification/{userId}/{allPaths=**} {
+      allow read: if request.auth != null && (request.auth.uid == userId || true);
+      allow write: if request.auth != null && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Map, Camera, ArrowRight, ArrowLeft, Loader2, MapPin, Languages, User, Sparkles } from "lucide-react";
+import { Map, Camera, ArrowRight, ArrowLeft, Loader2, MapPin, Languages, User, Sparkles, Upload, ShieldCheck, GraduationCap } from "lucide-react";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/lib/firebase/config";
+import { isStudentEmail } from "@/lib/verification";
 
-type Step = "role" | "guide-profile" | "guide-services";
+type Step = "role" | "guide-profile" | "guide-verification" | "guide-services";
 
 export default function OnboardingPage() {
     const { user, dbUser, loading } = useAuth();
@@ -31,12 +33,20 @@ export default function OnboardingPage() {
     const [guideCoverUrl, setGuideCoverUrl] = useState("");
     const [guidePricePerDay, setGuidePricePerDay] = useState("");
 
+    // Student ID Verification
+    const [studentIdFile, setStudentIdFile] = useState<File | null>(null);
+    const [studentIdPreview, setStudentIdPreview] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     // Guide First Service
     const [serviceTitle, setServiceTitle] = useState("");
     const [serviceDescription, setServiceDescription] = useState("");
     const [servicePrice, setServicePrice] = useState("");
     const [serviceCategory, setServiceCategory] = useState("guided_tour");
     const [servicePriceType, setServicePriceType] = useState("per_day");
+
+    const userIsStudent = user?.email ? isStudentEmail(user.email) : false;
 
     // Redirect if they already have a role or aren't logged in
     useEffect(() => {
@@ -53,9 +63,19 @@ export default function OnboardingPage() {
         }
     }, [user, dbUser, loading, router]);
 
+    const handleStudentIdSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            alert("File size must be under 5MB");
+            return;
+        }
+        setStudentIdFile(file);
+        setStudentIdPreview(URL.createObjectURL(file));
+    };
+
     const handleSelectRole = async (role: "customer" | "guide") => {
         if (role === "customer") {
-            // Customer: create doc and redirect immediately
             if (!user) return;
             setIsSubmitting(true);
             try {
@@ -64,6 +84,8 @@ export default function OnboardingPage() {
                     displayName: user.displayName || "User",
                     email: user.email,
                     photoURL: user.photoURL || null,
+                    isStudentEmail: user.email ? isStudentEmail(user.email) : false,
+                    nidStatus: "not_submitted",
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 });
@@ -73,7 +95,6 @@ export default function OnboardingPage() {
                 setIsSubmitting(false);
             }
         } else {
-            // Guide: go to profile setup step
             setSelectedRole("guide");
             setStep("guide-profile");
         }
@@ -81,6 +102,10 @@ export default function OnboardingPage() {
 
     const handleGuideProfileNext = () => {
         if (!guideName.trim()) return;
+        setStep("guide-verification");
+    };
+
+    const handleVerificationNext = () => {
         setStep("guide-services");
     };
 
@@ -105,17 +130,36 @@ export default function OnboardingPage() {
         }
 
         try {
+            // Upload student ID if provided
+            let studentIdUrl = "";
+            if (studentIdFile) {
+                setIsUploading(true);
+                const storageRef = ref(storage, `verification/${user.uid}/student_id_${Date.now()}`);
+                await uploadBytes(storageRef, studentIdFile);
+                studentIdUrl = await getDownloadURL(storageRef);
+                setIsUploading(false);
+            }
+
+            // Determine nogori status
+            let nogoriStatus = "pending";
+            if (userIsStudent) {
+                nogoriStatus = "id_submitted"; // Student email auto-detected, fast-track
+            } else if (studentIdUrl) {
+                nogoriStatus = "id_submitted"; // Manual ID uploaded
+            }
+
             // Create base user document
             await setDoc(doc(db, "users", user.uid), {
                 role: "guide",
                 displayName: guideName,
                 email: user.email,
                 photoURL: guideAvatarUrl || user.photoURL || null,
+                isStudentEmail: userIsStudent,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             });
 
-            // Create full guide profile document (matching expected format)
+            // Create full guide profile document
             await setDoc(doc(db, "guides", user.uid), {
                 name: guideName,
                 tagline: guideTagline,
@@ -125,18 +169,21 @@ export default function OnboardingPage() {
                 rating: 0,
                 reviews: 0,
                 trips: 0,
-                nogoriStatus: "pending",
+                nogoriStatus,
                 pricePerDay: Number(guidePricePerDay) || 0,
                 locations: locationsArray,
                 languages: languagesArray,
                 services: services,
                 portfolio: [],
+                studentIdUrl: studentIdUrl || null,
+                isStudentEmail: userIsStudent,
             });
 
             window.location.href = `/dashboard/guide`;
         } catch (error) {
             console.error("Error creating guide profile:", error);
             setIsSubmitting(false);
+            setIsUploading(false);
         }
     };
 
@@ -145,7 +192,9 @@ export default function OnboardingPage() {
             <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
                 <div className="animate-pulse flex flex-col items-center">
                     <div className="h-12 w-12 rounded-full border-4 border-teal-500 border-t-transparent animate-spin mb-4"></div>
-                    <p className="text-slate-500">Setting up your profile...</p>
+                    <p className="text-slate-500">
+                        {isUploading ? "Uploading verification document..." : "Setting up your profile..."}
+                    </p>
                 </div>
             </div>
         );
@@ -165,26 +214,24 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-                    {/* Customer Choice */}
                     <Card className="p-8 border-2 border-transparent hover:border-teal-500 transition-all cursor-pointer group bg-white dark:bg-slate-800 rounded-3xl" onClick={() => handleSelectRole("customer")}>
                         <div className="h-20 w-20 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <Map className="h-10 w-10 text-teal-600 dark:text-teal-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">I want to Explore</h2>
                         <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                            I'm a traveler looking to find and book amazing Nogori Verified local guides for my next trip.
+                            I&apos;m a traveler looking to find and book amazing Nogori Verified local guides for my next trip.
                         </p>
                         <Button className="w-full rounded-xl" size="lg">Continue as Traveler</Button>
                     </Card>
 
-                    {/* Guide Choice */}
                     <Card className="p-8 border-2 border-transparent hover:border-orange-500 transition-all cursor-pointer group bg-white dark:bg-slate-800 rounded-3xl" onClick={() => handleSelectRole("guide")}>
                         <div className="h-20 w-20 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <Camera className="h-10 w-10 text-orange-600 dark:text-orange-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">I want to Guide</h2>
                         <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                            I'm a local expert, photographer, or planner looking to offer my travel services and earn money.
+                            I&apos;m a local expert, photographer, or planner looking to offer my travel services and earn money.
                         </p>
                         <Button className="w-full rounded-xl bg-orange-600 hover:bg-orange-700 text-white" size="lg">Apply as Guide</Button>
                     </Card>
@@ -198,7 +245,6 @@ export default function OnboardingPage() {
         return (
             <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
                 <div className="max-w-2xl w-full">
-                    {/* Progress */}
                     <div className="flex items-center gap-3 mb-8">
                         <button onClick={() => setStep("role")} className="text-slate-400 hover:text-slate-600 transition-colors">
                             <ArrowLeft className="h-5 w-5" />
@@ -206,8 +252,9 @@ export default function OnboardingPage() {
                         <div className="flex-1 flex items-center gap-2">
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
                             <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
                         </div>
-                        <span className="text-sm text-slate-500 font-medium">Step 1 of 2</span>
+                        <span className="text-sm text-slate-500 font-medium">Step 1 of 3</span>
                     </div>
 
                     <div className="text-center mb-8">
@@ -274,6 +321,124 @@ export default function OnboardingPage() {
 
                         <div className="flex justify-end mt-8">
                             <Button onClick={handleGuideProfileNext} disabled={!guideName.trim()} className="h-12 px-8 rounded-xl bg-teal-600 hover:bg-teal-700 font-bold gap-2">
+                                Next: Verification
+                                <ArrowRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
+
+    // ─── STEP 3: Student ID Verification ────────────────────────
+    if (step === "guide-verification") {
+        return (
+            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
+                <div className="max-w-2xl w-full">
+                    <div className="flex items-center gap-3 mb-8">
+                        <button onClick={() => setStep("guide-profile")} className="text-slate-400 hover:text-slate-600 transition-colors">
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                        <div className="flex-1 flex items-center gap-2">
+                            <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                        </div>
+                        <span className="text-sm text-slate-500 font-medium">Step 2 of 3</span>
+                    </div>
+
+                    <div className="text-center mb-8">
+                        <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-4">
+                            <ShieldCheck className="h-7 w-7 text-emerald-600" />
+                        </div>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Verify Your Identity</h1>
+                        <p className="text-slate-500">Upload your student ID to get Nogori Verified faster. This builds trust with travelers.</p>
+                    </div>
+
+                    {/* Student Email Auto-Detect Banner */}
+                    {userIsStudent && (
+                        <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-start gap-3">
+                            <GraduationCap className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
+                            <div>
+                                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Student email detected!</p>
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                    Your email ({user?.email}) is from a recognized institution. You&apos;re eligible for fast-track verification.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
+                        <div className="flex flex-col gap-5">
+                            <div className="grid gap-2">
+                                <Label className="text-slate-700 dark:text-slate-300 font-semibold">
+                                    Student ID Card
+                                    {!userIsStudent && <span className="text-red-500"> *</span>}
+                                </Label>
+                                <p className="text-xs text-slate-500">
+                                    {userIsStudent
+                                        ? "Optional — your student email is already verified. Upload for additional trust."
+                                        : "Upload a clear photo of your student ID card (front side). Max 5MB."}
+                                </p>
+
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleStudentIdSelect}
+                                    className="hidden"
+                                />
+
+                                {studentIdPreview ? (
+                                    <div className="relative mt-2">
+                                        <img
+                                            src={studentIdPreview}
+                                            alt="Student ID preview"
+                                            className="w-full max-h-64 object-contain rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50"
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                setStudentIdFile(null);
+                                                setStudentIdPreview(null);
+                                            }}
+                                            className="absolute top-2 right-2 rounded-lg bg-white/90 dark:bg-slate-800/90 text-xs"
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="mt-2 flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl hover:border-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors cursor-pointer"
+                                    >
+                                        <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                            <Upload className="h-6 w-6 text-slate-400" />
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Click to upload your Student ID</p>
+                                            <p className="text-xs text-slate-400 mt-1">JPG, PNG up to 5MB</p>
+                                        </div>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                            {userIsStudent ? (
+                                <Button variant="ghost" onClick={handleVerificationNext} className="text-slate-500 font-medium rounded-xl">
+                                    Skip — use student email
+                                </Button>
+                            ) : (
+                                <div />
+                            )}
+                            <Button
+                                onClick={handleVerificationNext}
+                                disabled={!userIsStudent && !studentIdFile}
+                                className="h-12 px-8 rounded-xl bg-teal-600 hover:bg-teal-700 font-bold gap-2"
+                            >
                                 Next: Add a Service
                                 <ArrowRight className="h-4 w-4" />
                             </Button>
@@ -284,21 +449,21 @@ export default function OnboardingPage() {
         );
     }
 
-    // ─── STEP 3: First Service ──────────────────────────────────
+    // ─── STEP 4: First Service ──────────────────────────────────
     if (step === "guide-services") {
         return (
             <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
                 <div className="max-w-2xl w-full">
-                    {/* Progress */}
                     <div className="flex items-center gap-3 mb-8">
-                        <button onClick={() => setStep("guide-profile")} className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <button onClick={() => setStep("guide-verification")} className="text-slate-400 hover:text-slate-600 transition-colors">
                             <ArrowLeft className="h-5 w-5" />
                         </button>
                         <div className="flex-1 flex items-center gap-2">
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
                         </div>
-                        <span className="text-sm text-slate-500 font-medium">Step 2 of 2</span>
+                        <span className="text-sm text-slate-500 font-medium">Step 3 of 3</span>
                     </div>
 
                     <div className="text-center mb-8">
@@ -306,7 +471,7 @@ export default function OnboardingPage() {
                             <Sparkles className="h-7 w-7 text-orange-600" />
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Add Your First Service</h1>
-                        <p className="text-slate-500">What's the main thing travelers can book you for? You can add more later.</p>
+                        <p className="text-slate-500">What&apos;s the main thing travelers can book you for? You can add more later.</p>
                     </div>
 
                     <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">

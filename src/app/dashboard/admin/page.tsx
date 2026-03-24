@@ -1,193 +1,323 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { collection, query, getDocs, where } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
-import { Loader2, Users, MapPin, DollarSign, TrendingUp, BarChart3, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShieldCheck, CheckCircle, XCircle, GraduationCap, CreditCard, Loader2, Eye } from "lucide-react";
 
-export default function AdminOverviewPage() {
+interface PendingGuide {
+    id: string;
+    name: string;
+    email?: string;
+    nogoriStatus: string;
+    studentIdUrl?: string;
+    isStudentEmail?: boolean;
+    avatarUrl?: string;
+}
+
+interface PendingNid {
+    id: string;
+    displayName: string;
+    email: string;
+    nidUrl: string;
+    nidStatus: string;
+}
+
+export default function AdminDashboard() {
     const { user, dbUser, loading } = useAuth();
+    const router = useRouter();
+
+    const [pendingGuides, setPendingGuides] = useState<PendingGuide[]>([]);
+    const [pendingNids, setPendingNids] = useState<PendingNid[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [stats, setStats] = useState({
-        totalUsers: 0,
-        activeGuides: 0,
-        pendingGuides: 0,
-        platformRevenue: 0,
-        totalBookings: 0,
-    });
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+    // Auth Guard — admin only
     useEffect(() => {
-        const fetchAdminStats = async () => {
-            if (!user?.uid || dbUser?.role !== "admin") return;
+        if (!loading) {
+            if (!user) router.push("/");
+            else if (dbUser && dbUser.role !== "admin") router.push(`/dashboard/${dbUser.role}`);
+        }
+    }, [user, dbUser, loading, router]);
+
+    // Fetch pending verifications
+    useEffect(() => {
+        const fetchPending = async () => {
             try {
-                // Fetch Guides
-                const guidesSnap = await getDocs(collection(db, "guides"));
-                const guides = guidesSnap.docs.map(doc => doc.data());
-                
-                // Fetch Orders
-                const ordersSnap = await getDocs(collection(db, "orders"));
-                const orders = ordersSnap.docs.map(doc => doc.data());
+                // Fetch guides with id_submitted status
+                const guidesQuery = query(
+                    collection(db, "guides"),
+                    where("nogoriStatus", "==", "id_submitted")
+                );
+                const guidesSnap = await getDocs(guidesQuery);
+                const guides = guidesSnap.docs.map(d => ({
+                    id: d.id,
+                    ...d.data()
+                })) as PendingGuide[];
+                setPendingGuides(guides);
 
-                let revenue = 0;
-                orders.forEach(order => {
-                    if (order.status === 'completed' || order.status === 'confirmed') {
-                        // Assuming platform fee is 10% if not explicitly set
-                        const fee = order.platformFee || (Number(order.totalPrice) * 0.1);
-                        revenue += fee;
-                    }
-                });
-
-                setStats({
-                    totalUsers: guides.length * 5, // Mock multiplier for actual users count
-                    activeGuides: guides.filter(g => g.nogoriStatus === 'verified' || g.nogoriStatus === 'pro').length,
-                    pendingGuides: guides.filter(g => g.nogoriStatus === 'pending').length,
-                    platformRevenue: revenue,
-                    totalBookings: orders.length,
-                });
+                // Fetch users with NID submitted
+                const nidQuery = query(
+                    collection(db, "users"),
+                    where("nidStatus", "==", "submitted")
+                );
+                const nidSnap = await getDocs(nidQuery);
+                const nids = nidSnap.docs.map(d => ({
+                    id: d.id,
+                    ...d.data()
+                })) as PendingNid[];
+                setPendingNids(nids);
             } catch (error) {
-                console.error("Error fetching admin stats:", error);
+                console.error("Error fetching pending verifications:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        if (user && dbUser?.role === "admin") fetchAdminStats();
+        if (user && dbUser?.role === "admin") {
+            fetchPending();
+        }
     }, [user, dbUser]);
 
-    if (loading || isLoading || !user) {
-        return <div className="flex justify-center p-24"><Loader2 className="h-8 w-8 animate-spin text-teal-600" /></div>;
-    }
+    const handleGuideAction = async (guideId: string, action: "verified" | "rejected") => {
+        setActionLoading(guideId);
+        try {
+            await updateDoc(doc(db, "guides", guideId), {
+                nogoriStatus: action,
+            });
+            setPendingGuides(prev => prev.filter(g => g.id !== guideId));
+        } catch (error) {
+            console.error("Error updating guide status:", error);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleNidAction = async (userId: string, action: "verified" | "rejected") => {
+        setActionLoading(userId);
+        try {
+            await updateDoc(doc(db, "users", userId), {
+                nidStatus: action,
+                updatedAt: serverTimestamp(),
+            });
+            setPendingNids(prev => prev.filter(n => n.id !== userId));
+        } catch (error) {
+            console.error("Error updating NID status:", error);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    if (loading || dbUser?.role !== "admin") return null;
 
     return (
-        <div className="max-w-6xl space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Platform Overview</h1>
-                    <p className="text-slate-500">Monitor Ghuri's growth, revenue, and active community.</p>
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+            <div className="mb-8">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                        <ShieldCheck className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Admin Panel</h1>
                 </div>
-                <div className="flex items-center gap-3 bg-white dark:bg-slate-900 border px-4 py-2 rounded-xl shadow-sm">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 tracking-wider">LIVE DATA</span>
+                <p className="text-slate-500 ml-13">Review and approve guide and customer verifications.</p>
+            </div>
+
+            <Tabs defaultValue="guides" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                    <TabsTrigger value="guides" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                        <GraduationCap className="h-4 w-4" />
+                        Guide Verifications
+                        {pendingGuides.length > 0 && (
+                            <span className="ml-1 h-5 min-w-5 px-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">
+                                {pendingGuides.length}
+                            </span>
+                        )}
+                    </TabsTrigger>
+                    <TabsTrigger value="nid" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        NID Verifications
+                        {pendingNids.length > 0 && (
+                            <span className="ml-1 h-5 min-w-5 px-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">
+                                {pendingNids.length}
+                            </span>
+                        )}
+                    </TabsTrigger>
+                </TabsList>
+
+                {/* ─── Guide Verifications Tab ─────────────────── */}
+                <TabsContent value="guides" className="mt-0">
+                    {isLoading ? (
+                        <div className="space-y-4">
+                            {[1, 2].map(i => (
+                                <div key={i} className="w-full h-36 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
+                            ))}
+                        </div>
+                    ) : pendingGuides.length === 0 ? (
+                        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                            <CheckCircle className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">All caught up!</h3>
+                            <p className="text-slate-500">No pending guide verifications.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {pendingGuides.map((guide) => (
+                                <Card key={guide.id} className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                                    <div className="flex flex-col md:flex-row gap-4">
+                                        {/* Guide Info */}
+                                        <div className="flex items-start gap-4 flex-1">
+                                            {guide.avatarUrl ? (
+                                                <img src={guide.avatarUrl} alt={guide.name} className="h-12 w-12 rounded-xl object-cover" />
+                                            ) : (
+                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-lg">
+                                                    {guide.name?.charAt(0)}
+                                                </div>
+                                            )}
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{guide.name}</h3>
+                                                {guide.email && (
+                                                    <p className="text-sm text-slate-500">{guide.email}</p>
+                                                )}
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    {guide.isStudentEmail && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+                                                            <GraduationCap className="h-3 w-3" />
+                                                            Student Email
+                                                        </span>
+                                                    )}
+                                                    {guide.studentIdUrl && (
+                                                        <button
+                                                            onClick={() => setPreviewImage(guide.studentIdUrl!)}
+                                                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium hover:bg-blue-100 transition-colors cursor-pointer"
+                                                        >
+                                                            <Eye className="h-3 w-3" />
+                                                            View Student ID
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => handleGuideAction(guide.id, "rejected")}
+                                                disabled={actionLoading === guide.id}
+                                                className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                            >
+                                                {actionLoading === guide.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1.5" />}
+                                                Reject
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleGuideAction(guide.id, "verified")}
+                                                disabled={actionLoading === guide.id}
+                                                className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                                            >
+                                                {actionLoading === guide.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1.5" />}
+                                                Approve
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </TabsContent>
+
+                {/* ─── NID Verifications Tab ───────────────────── */}
+                <TabsContent value="nid" className="mt-0">
+                    {isLoading ? (
+                        <div className="space-y-4">
+                            {[1, 2].map(i => (
+                                <div key={i} className="w-full h-36 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
+                            ))}
+                        </div>
+                    ) : pendingNids.length === 0 ? (
+                        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                            <CheckCircle className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">All caught up!</h3>
+                            <p className="text-slate-500">No pending NID verifications.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {pendingNids.map((nid) => (
+                                <Card key={nid.id} className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                                    <div className="flex flex-col md:flex-row gap-4">
+                                        <div className="flex items-start gap-4 flex-1">
+                                            <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-lg">
+                                                {nid.displayName?.charAt(0) || "?"}
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{nid.displayName}</h3>
+                                                <p className="text-sm text-slate-500">{nid.email}</p>
+                                                {nid.nidUrl && (
+                                                    <button
+                                                        onClick={() => setPreviewImage(nid.nidUrl)}
+                                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium hover:bg-blue-100 transition-colors cursor-pointer mt-2"
+                                                    >
+                                                        <Eye className="h-3 w-3" />
+                                                        View NID Card
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => handleNidAction(nid.id, "rejected")}
+                                                disabled={actionLoading === nid.id}
+                                                className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                            >
+                                                {actionLoading === nid.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-1.5" />}
+                                                Reject
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleNidAction(nid.id, "verified")}
+                                                disabled={actionLoading === nid.id}
+                                                className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                                            >
+                                                {actionLoading === nid.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1.5" />}
+                                                Approve
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </TabsContent>
+            </Tabs>
+
+            {/* ─── Image Preview Modal ────────────────────────── */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-2xl w-full max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
+                        <img
+                            src={previewImage}
+                            alt="Verification document"
+                            className="w-full max-h-[80vh] object-contain rounded-2xl bg-white"
+                        />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute top-3 right-3 rounded-lg bg-white/90 shadow-lg"
+                        >
+                            Close
+                        </Button>
+                    </div>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-4 bg-gradient-to-br from-indigo-900 to-indigo-950 text-white">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 backdrop-blur-md">
-                            <DollarSign className="h-5 w-5" />
-                        </div>
-                        <span className="font-bold tracking-wider text-sm opacity-90">Total Revenue</span>
-                    </div>
-                    <div>
-                        <p className="text-4xl font-black">৳{stats.platformRevenue.toLocaleString()}</p>
-                        <p className="text-xs font-medium text-emerald-400 mt-2 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> +14% this month</p>
-                    </div>
-                </Card>
-
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-                            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
-                                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <span className="font-bold tracking-wider text-sm uppercase">Active Guides</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-4xl font-black">{stats.activeGuides}</p>
-                    </div>
-                </Card>
-
-                <Card className="p-6 rounded-3xl border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-900 shadow-sm flex flex-col gap-4 relative overflow-hidden group">
-                    <div className="absolute right-0 top-0 w-24 h-24 bg-amber-200 dark:bg-amber-800 rounded-bl-[100px] opacity-20 transition-transform group-hover:scale-110"></div>
-                    <div className="flex items-center justify-between relative z-10">
-                        <div className="flex items-center gap-3 text-amber-900 dark:text-amber-500">
-                            <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center shrink-0">
-                                <AlertCircle className="h-5 w-5" />
-                            </div>
-                            <span className="font-bold tracking-wider text-sm uppercase">Pending Approvals</span>
-                        </div>
-                    </div>
-                    <div className="relative z-10 flex items-end justify-between">
-                        <p className="text-4xl font-black text-amber-600 dark:text-amber-400">{stats.pendingGuides}</p>
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-200 px-2 py-1 rounded-md">Action Required</span>
-                    </div>
-                </Card>
-
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-                            <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
-                                <BarChart3 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                            </div>
-                            <span className="font-bold tracking-wider text-sm uppercase">Total Bookings</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-4xl font-black">{stats.totalBookings}</p>
-                        <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 mt-2 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> All time</p>
-                    </div>
-                </Card>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm min-h-[350px]">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="font-bold text-lg flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-teal-600" />
-                            Trending Destinations
-                        </h3>
-                    </div>
-                    <div className="space-y-6">
-                        {/* Mock Trending Data */}
-                        {[
-                            { name: "Sylhet", percentage: 45, bookings: 124 },
-                            { name: "Cox's Bazar", percentage: 30, bookings: 86 },
-                            { name: "Bandarban", percentage: 15, bookings: 42 },
-                            { name: "Saint Martin", percentage: 10, bookings: 21 },
-                        ].map((dest, i) => (
-                            <div key={i} className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between text-sm font-bold">
-                                    <span>{dest.name}</span>
-                                    <span className="text-slate-500">{dest.bookings} Bookings</span>
-                                </div>
-                                <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                    <div 
-                                        className="h-full bg-teal-500 rounded-full"
-                                        style={{ width: `${dest.percentage}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
-
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm min-h-[350px]">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="font-bold text-lg flex items-center gap-2">
-                            <BarChart3 className="h-5 w-5 text-indigo-600" />
-                            Revenue Forecast
-                        </h3>
-                    </div>
-                    <div className="h-48 flex items-end gap-2 md:gap-4 pt-4">
-                        {/* Mock Chart */}
-                        {[30, 50, 45, 70, 85, 100].map((val, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                                <div className="w-full flex justify-center h-full relative">
-                                    <div 
-                                        className="w-full max-w-[32px] bg-indigo-100 dark:bg-indigo-900/40 rounded-t-xl group-hover:bg-indigo-500 transition-colors absolute bottom-0"
-                                        style={{ height: `${val}%` }}
-                                    ></div>
-                                </div>
-                                <span className="text-[10px] font-bold text-slate-400">M{i+1}</span>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
-            </div>
+            )}
         </div>
     );
 }
