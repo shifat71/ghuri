@@ -1,21 +1,73 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, query, where, getDocs, doc, getDoc, orderBy, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     CheckCircle2, ShieldAlert, Users, TrendingUp, User, Compass,
     Wallet, Star, Calendar, Clock, ChevronRight, MapPin, CreditCard,
-    BadgeDollarSign, BarChart3, CheckCircle, XCircle, Loader2, MessageSquare
+    BadgeDollarSign, BarChart3, CheckCircle, XCircle, Loader2, MessageSquare,
+    Upload, GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GuideFeed } from "@/components/guide/GuideFeed";
 import Link from "next/link";
 import { getVerificationBadge } from "@/lib/verification";
+
+// ─── Reusable Student ID upload UI ──────────────────────────────────────────
+function VerificationUploadUI({
+    studentIdFile, studentIdPreview, isUploading, uploadError,
+    onSelect, onUpload, onRemove, inputRef,
+}: {
+    studentIdFile: File | null;
+    studentIdPreview: string | null;
+    isUploading: boolean;
+    uploadError: string | null;
+    onSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onUpload: () => void;
+    onRemove: () => void;
+    inputRef: React.RefObject<HTMLInputElement | null>;
+}) {
+    return (
+        <div className="flex flex-col gap-3">
+            <input ref={inputRef} type="file" accept="image/*" onChange={onSelect} className="hidden" />
+            {studentIdPreview ? (
+                <div className="relative">
+                    <img src={studentIdPreview} alt="Student ID preview" className="w-full max-h-48 object-contain rounded-xl border border-slate-200 bg-white" />
+                    <button onClick={onRemove} className="absolute top-2 right-2 text-xs bg-white/90 px-2 py-1 rounded-lg border text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors">Remove</button>
+                </div>
+            ) : (
+                <button
+                    onClick={() => inputRef.current?.click()}
+                    className="flex items-center gap-3 p-4 border-2 border-dashed border-amber-200 dark:border-amber-800 rounded-xl hover:border-teal-400 hover:bg-teal-50/30 transition-colors cursor-pointer"
+                >
+                    <div className="h-10 w-10 rounded-xl bg-white/80 border border-slate-200 flex items-center justify-center shrink-0">
+                        <Upload className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <div className="text-left">
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Upload Student ID card</p>
+                        <p className="text-xs text-slate-400">JPG or PNG, max 5MB</p>
+                    </div>
+                </button>
+            )}
+            {uploadError && <p className="text-xs text-red-600 font-medium">{uploadError}</p>}
+            {studentIdFile && (
+                <Button
+                    onClick={onUpload}
+                    disabled={isUploading}
+                    className="w-full rounded-xl bg-teal-600 hover:bg-teal-700 gap-2"
+                >
+                    {isUploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</> : <><GraduationCap className="h-4 w-4" /> Submit for Verification</>}
+                </Button>
+            )}
+        </div>
+    );
+}
 
 export default function GuideDashboard() {
     const { user, dbUser, loading } = useAuth();
@@ -24,6 +76,14 @@ export default function GuideDashboard() {
     const [orders, setOrders] = useState<any[]>([]);
     const [isLoadingPage, setIsLoadingPage] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+    // Student ID upload state (for guides with pending/rejected status)
+    const [studentIdFile, setStudentIdFile] = useState<File | null>(null);
+    const [studentIdPreview, setStudentIdPreview] = useState<string | null>(null);
+    const [isUploadingId, setIsUploadingId] = useState(false);
+    const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const studentIdInputRef = useRef<HTMLInputElement>(null);
 
     // Auth Guard
     useEffect(() => {
@@ -67,6 +127,42 @@ export default function GuideDashboard() {
             console.error("Error updating order:", error);
         } finally {
             setActionLoading(null);
+        }
+    };
+
+    const handleStudentIdSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { setUploadError("File must be under 5MB"); return; }
+        setStudentIdFile(file);
+        setStudentIdPreview(URL.createObjectURL(file));
+        setUploadError(null);
+    };
+
+    const handleStudentIdUpload = async () => {
+        if (!user || !studentIdFile) return;
+        setIsUploadingId(true);
+        setUploadError(null);
+        try {
+            const storageRef = ref(storage, `verification/${user.uid}/student_id_${Date.now()}`);
+            await uploadBytes(storageRef, studentIdFile);
+            const studentIdUrl = await getDownloadURL(storageRef);
+
+            // Update the guide doc with the new student ID URL and set status to id_submitted
+            await updateDoc(doc(db, "guides", user.uid), {
+                studentIdUrl,
+                nogoriStatus: "id_submitted",
+            });
+
+            setGuideProfile((prev: any) => ({ ...prev, nogoriStatus: "id_submitted", studentIdUrl }));
+            setUploadSuccess(true);
+            setStudentIdFile(null);
+            setStudentIdPreview(null);
+        } catch (err: any) {
+            console.error("Student ID upload error:", err);
+            setUploadError("Upload failed. Please try again or contact support.");
+        } finally {
+            setIsUploadingId(false);
         }
     };
 
@@ -133,23 +229,76 @@ export default function GuideDashboard() {
                 </div>
             </div>
 
-            {/* Verification Warning */}
+            {/* Verification Card — shown for all non-verified states */}
             {!isVerified && (
-                <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900 rounded-2xl p-4 mb-6 flex items-start gap-3">
-                    <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-                    <div>
-                        <h3 className="text-sm font-bold text-amber-900 dark:text-amber-400">
-                            {guideProfile?.nogoriStatus === "id_submitted"
-                                ? "Your verification is under review"
-                                : "Complete your Nogori Verification"}
-                        </h3>
-                        <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-                            {guideProfile?.nogoriStatus === "id_submitted"
-                                ? "Our team is reviewing your documents. You'll be notified once approved."
-                                : "Upload your student ID or contact info@ghuri.com to get verified."}
-                        </p>
-                    </div>
-                </div>
+                <Card className="mb-6 rounded-2xl border-amber-200 dark:border-amber-900 overflow-hidden">
+                    {guideProfile?.nogoriStatus === "id_submitted" ? (
+                        /* Under review */
+                        <div className="p-5 flex items-start gap-3 bg-blue-50 dark:bg-blue-950/30">
+                            <Loader2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5 animate-spin" />
+                            <div>
+                                <h3 className="text-sm font-bold text-blue-900 dark:text-blue-300">Your Student ID is under review</h3>
+                                <p className="text-xs text-blue-700 dark:text-blue-400 mt-0.5">
+                                    Our team is reviewing your document. You can start setting up your profile in the meantime.
+                                    You&apos;ll be able to accept bookings once approved.
+                                </p>
+                            </div>
+                        </div>
+                    ) : guideProfile?.nogoriStatus === "rejected" ? (
+                        /* Rejected — re-upload */
+                        <div className="p-5 bg-red-50 dark:bg-red-950/30 border-b border-red-100 dark:border-red-900">
+                            <div className="flex items-start gap-3 mb-4">
+                                <XCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                                <div>
+                                    <h3 className="text-sm font-bold text-red-900 dark:text-red-300">Verification rejected</h3>
+                                    <p className="text-xs text-red-700 dark:text-red-400 mt-0.5">
+                                        Your document could not be verified. Please upload a clearer photo of your Student ID.
+                                    </p>
+                                </div>
+                            </div>
+                            <VerificationUploadUI
+                                studentIdFile={studentIdFile}
+                                studentIdPreview={studentIdPreview}
+                                isUploading={isUploadingId}
+                                uploadError={uploadError}
+                                onSelect={handleStudentIdSelect}
+                                onUpload={handleStudentIdUpload}
+                                onRemove={() => { setStudentIdFile(null); setStudentIdPreview(null); }}
+                                inputRef={studentIdInputRef}
+                            />
+                        </div>
+                    ) : (
+                        /* Pending — first-time upload */
+                        <div className="p-5 bg-amber-50 dark:bg-amber-950/30">
+                            <div className="flex items-start gap-3 mb-4">
+                                <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                                <div>
+                                    <h3 className="text-sm font-bold text-amber-900 dark:text-amber-300">Complete Nogori Verification to accept bookings</h3>
+                                    <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                        Upload your Student ID card to submit your verification request. Admin will review it shortly.
+                                    </p>
+                                </div>
+                            </div>
+                            {uploadSuccess ? (
+                                <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                                    <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                                    <p className="text-sm text-emerald-700 font-medium">Student ID submitted! Our team will review it shortly.</p>
+                                </div>
+                            ) : (
+                                <VerificationUploadUI
+                                    studentIdFile={studentIdFile}
+                                    studentIdPreview={studentIdPreview}
+                                    isUploading={isUploadingId}
+                                    uploadError={uploadError}
+                                    onSelect={handleStudentIdSelect}
+                                    onUpload={handleStudentIdUpload}
+                                    onRemove={() => { setStudentIdFile(null); setStudentIdPreview(null); }}
+                                    inputRef={studentIdInputRef}
+                                />
+                            )}
+                        </div>
+                    )}
+                </Card>
             )}
 
             {/* Earnings & Stats Grid */}

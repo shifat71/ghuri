@@ -134,14 +134,20 @@ export default function OnboardingPage() {
         }
 
         try {
-            // Upload student ID if provided
+            // Upload student ID if provided (non-blocking — failure doesn't prevent sign-up)
             let studentIdUrl = "";
             if (studentIdFile) {
                 setIsUploading(true);
-                const storageRef = ref(storage, `verification/${user.uid}/student_id_${Date.now()}`);
-                await uploadBytes(storageRef, studentIdFile);
-                studentIdUrl = await getDownloadURL(storageRef);
-                setIsUploading(false);
+                try {
+                    const storageRef = ref(storage, `verification/${user.uid}/student_id_${Date.now()}`);
+                    await uploadBytes(storageRef, studentIdFile);
+                    studentIdUrl = await getDownloadURL(storageRef);
+                } catch (uploadErr) {
+                    // Storage rules may not be deployed yet; guide can re-upload from dashboard
+                    console.warn("Student ID upload failed (will proceed without it):", uploadErr);
+                } finally {
+                    setIsUploading(false);
+                }
             }
 
             // Check student email against Firestore-stored accepted domains
@@ -150,9 +156,9 @@ export default function OnboardingPage() {
                 : false;
 
             // Determine nogori status:
-            // - Student email from accepted list → auto-verified (no admin review needed)
-            // - Manual student ID upload → id_submitted (admin reviews)
-            // - Neither → pending (shouldn't happen due to UI gate, but safety fallback)
+            // - Student email from accepted list → auto-verified instantly
+            // - Manual student ID upload succeeded → id_submitted (admin reviews)
+            // - No upload / upload failed → pending (can upload from dashboard later)
             let nogoriStatus = "pending";
             if (isVerifiedStudent) {
                 nogoriStatus = "verified"; // Auto-accepted: edu email in accepted list
@@ -367,17 +373,27 @@ export default function OnboardingPage() {
                             <ShieldCheck className="h-7 w-7 text-emerald-600" />
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Verify Your Identity</h1>
-                        <p className="text-slate-500">Upload your student ID to get Nogori Verified faster. This builds trust with travelers.</p>
+                        <p className="text-slate-500">You can upload your student ID now or do it later from your dashboard.</p>
                     </div>
 
                     {/* Student Email Auto-Detect Banner */}
-                    {userIsStudent && (
+                    {userIsStudent ? (
                         <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-start gap-3">
                             <GraduationCap className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
                             <div>
-                                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Student email detected!</p>
+                                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Student email detected — you&apos;ll be auto-verified!</p>
                                 <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
-                                    Your email ({user?.email}) is from a recognized institution. You&apos;re eligible for fast-track verification.
+                                    Your email ({user?.email}) is from a recognized institution. No ID upload needed.
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-3">
+                            <ShieldCheck className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                            <div>
+                                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Student ID required to receive bookings</p>
+                                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                    You can skip this for now and upload from your dashboard. You won&apos;t be able to accept bookings until verified.
                                 </p>
                             </div>
                         </div>
@@ -387,13 +403,10 @@ export default function OnboardingPage() {
                         <div className="flex flex-col gap-5">
                             <div className="grid gap-2">
                                 <Label className="text-slate-700 dark:text-slate-300 font-semibold">
-                                    Student ID Card
-                                    {!userIsStudent && <span className="text-red-500"> *</span>}
+                                    Student ID Card <span className="text-slate-400 font-normal text-xs">(optional — can upload later)</span>
                                 </Label>
                                 <p className="text-xs text-slate-500">
-                                    {userIsStudent
-                                        ? "Optional — your student email is already verified. Upload for additional trust."
-                                        : "Upload a clear photo of your student ID card (front side). Max 5MB."}
+                                    Upload a clear photo of your student ID card (front side). Max 5MB.
                                 </p>
 
                                 <input
@@ -441,16 +454,12 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                            {userIsStudent ? (
-                                <Button variant="ghost" onClick={handleVerificationNext} className="text-slate-500 font-medium rounded-xl">
-                                    Skip — use student email
-                                </Button>
-                            ) : (
-                                <div />
-                            )}
+                            <Button variant="ghost" onClick={handleVerificationNext} className="text-slate-500 font-medium rounded-xl">
+                                {studentIdFile ? "Skip upload, do it later" : "Skip for now"}
+                            </Button>
                             <Button
                                 onClick={handleVerificationNext}
-                                disabled={!userIsStudent && !studentIdFile}
+                                disabled={false}
                                 className="h-12 px-8 rounded-xl bg-teal-600 hover:bg-teal-700 font-bold gap-2"
                             >
                                 Next: Add a Service
