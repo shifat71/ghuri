@@ -12,7 +12,7 @@ import { Map, Camera, ArrowRight, ArrowLeft, Loader2, MapPin, Languages, User, S
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase/config";
-import { isStudentEmail } from "@/lib/verification";
+import { isStudentEmail, isStudentEmailAsync, getAcceptedDomains } from "@/lib/verification";
 
 type Step = "role" | "guide-profile" | "guide-verification" | "guide-services";
 
@@ -46,7 +46,11 @@ export default function OnboardingPage() {
     const [serviceCategory, setServiceCategory] = useState("guided_tour");
     const [servicePriceType, setServicePriceType] = useState("per_day");
 
+    // Use sync check for UI hints, async check happens at submission time
     const userIsStudent = user?.email ? isStudentEmail(user.email) : false;
+
+    // Pre-fetch accepted domains from Firestore on mount (warms the cache)
+    useEffect(() => { getAcceptedDomains(); }, []);
 
     // Redirect if they already have a role or aren't logged in
     useEffect(() => {
@@ -140,12 +144,20 @@ export default function OnboardingPage() {
                 setIsUploading(false);
             }
 
-            // Determine nogori status
+            // Check student email against Firestore-stored accepted domains
+            const isVerifiedStudent = user.email
+                ? await isStudentEmailAsync(user.email)
+                : false;
+
+            // Determine nogori status:
+            // - Student email from accepted list → auto-verified (no admin review needed)
+            // - Manual student ID upload → id_submitted (admin reviews)
+            // - Neither → pending (shouldn't happen due to UI gate, but safety fallback)
             let nogoriStatus = "pending";
-            if (userIsStudent) {
-                nogoriStatus = "id_submitted"; // Student email auto-detected, fast-track
+            if (isVerifiedStudent) {
+                nogoriStatus = "verified"; // Auto-accepted: edu email in accepted list
             } else if (studentIdUrl) {
-                nogoriStatus = "id_submitted"; // Manual ID uploaded
+                nogoriStatus = "id_submitted"; // Needs manual admin review
             }
 
             // Create base user document
@@ -154,14 +166,15 @@ export default function OnboardingPage() {
                 displayName: guideName,
                 email: user.email,
                 photoURL: guideAvatarUrl || user.photoURL || null,
-                isStudentEmail: userIsStudent,
+                isStudentEmail: isVerifiedStudent,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             });
 
-            // Create full guide profile document
+            // Create full guide profile document (including email for admin visibility)
             await setDoc(doc(db, "guides", user.uid), {
                 name: guideName,
+                email: user.email,
                 tagline: guideTagline,
                 bio: guideBio,
                 avatarUrl: guideAvatarUrl || user.photoURL || "",
@@ -176,7 +189,8 @@ export default function OnboardingPage() {
                 services: services,
                 portfolio: [],
                 studentIdUrl: studentIdUrl || null,
-                isStudentEmail: userIsStudent,
+                isStudentEmail: isVerifiedStudent,
+                createdAt: serverTimestamp(),
             });
 
             window.location.href = `/dashboard/guide`;

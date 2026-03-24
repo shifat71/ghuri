@@ -1,6 +1,93 @@
 # Ghuri — Development Progress
 
-> Last updated: 2026-03-23
+> Last updated: 2026-03-24
+
+---
+
+## How to Login as Admin
+
+1. Sign up or log in with any Google or email account
+2. Navigate to `/dev/seed-admin` in your browser
+3. Click **"Elevate to Admin"** — this sets your `users` doc `role` to `"admin"`
+4. Refresh the page — you will be redirected to `/dashboard/admin`
+5. **First time setup:** Click **"Seed Accepted Edu Domains"** to populate the Firestore `settings/accepted_edu_domains` document with the default university domain list
+
+> **Note:** The `/dev/seed-admin` page is a development utility. In production, remove this route or protect it with an environment check. Admin role should be set directly in Firestore Console.
+
+---
+
+## Document Verification Flow
+
+### Guide Verification (Nogori Status)
+
+```
+Student registers as Guide
+        │
+        ▼
+  Has .edu.bd / .ac.bd email?
+   (checked against Firestore
+    settings/accepted_edu_domains)
+        │
+    ┌───┴───┐
+    │ YES   │ NO
+    ▼       ▼
+ Auto-     Must upload
+ verified  Student ID
+ (nogoriStatus:  (nogoriStatus:
+  "verified")     "id_submitted")
+                  │
+                  ▼
+            Admin reviews
+            at /dashboard/admin
+            (Guide Verifications tab)
+                  │
+            ┌─────┴─────┐
+            │ Approve   │ Reject
+            ▼           ▼
+         "verified"  "rejected"
+```
+
+**Where data lives:**
+- Guide profile: `guides/{uid}` collection — fields: `nogoriStatus`, `studentIdUrl`, `isStudentEmail`, `email`
+- Student ID image: Firebase Storage `verification/{uid}/student_id_{timestamp}`
+- Accepted edu domains: Firestore `settings/accepted_edu_domains` — field: `domains` (string array)
+
+**Accepted domains are managed** in the Admin Panel → "Edu Domains" tab. Admin can add/remove domains and save. The app fetches this list at runtime and caches it for 5 minutes.
+
+### Customer NID Verification
+
+```
+Customer signs up
+        │
+        ▼
+  nidStatus: "not_submitted"
+        │
+        ▼
+  Uploads NID on Customer Dashboard
+  (or prompted when trying to book)
+        │
+        ▼
+  nidStatus: "submitted"
+  nidUrl: <Firebase Storage URL>
+        │
+        ▼
+  Admin reviews at /dashboard/admin
+  (NID Verifications tab)
+        │
+   ┌────┴────┐
+   │ Approve │ Reject
+   ▼         ▼
+"verified"  "rejected"
+             │
+             ▼
+        Customer can re-upload
+```
+
+**Where data lives:**
+- User doc: `users/{uid}` collection — fields: `nidStatus`, `nidUrl`
+- NID image: Firebase Storage `verification/{uid}/nid_{timestamp}`
+
+**Booking Gate:** The `BookingWizard` checks `dbUser.nidStatus` before allowing a booking. If NID is `"not_submitted"` or `"rejected"`, the wizard shows a prompt to upload NID first (links to customer dashboard).
 
 ---
 

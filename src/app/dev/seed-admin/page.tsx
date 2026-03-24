@@ -102,7 +102,7 @@ export default function SeedAdminPage() {
                                 {loading ? "Updating..." : "Elevate to Verified Guide"}
                             </button>
 
-                            <button 
+                            <button
                                 onClick={async () => {
                                     setLoading(true);
                                     try {
@@ -126,6 +126,24 @@ export default function SeedAdminPage() {
                                 className="w-full py-3 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
                             >
                                 {loading ? "..." : "Fix Existing Guides (Visibility)"}
+                            </button>
+
+                            <button
+                                onClick={async () => {
+                                    setLoading(true);
+                                    try {
+                                        const { seedAcceptedDomains } = await import("@/lib/verification");
+                                        await seedAcceptedDomains();
+                                        setMessage("Accepted edu domains seeded in Firestore (settings/accepted_edu_domains). You can manage them from the Admin panel.");
+                                    } catch (err: any) {
+                                        setMessage(`Error: ${err.message}`);
+                                    }
+                                    setLoading(false);
+                                }}
+                                disabled={loading}
+                                className="w-full py-3 border-2 border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl hover:bg-amber-50 transition-colors disabled:opacity-50"
+                            >
+                                {loading ? "..." : "Seed Accepted Edu Domains"}
                             </button>
                         </div>
 

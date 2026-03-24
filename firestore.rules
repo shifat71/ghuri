@@ -36,6 +36,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ─── Settings Collection (edu domains, platform config) ──
+    // Public read (all users can check accepted domains), admin-only write.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ─── Guide Posts ──────────────────────────────────────
     // Public read, guide owner can create/update/delete own posts.
     match /guide_posts/{postId} {

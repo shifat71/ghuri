@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, CheckCircle, XCircle, GraduationCap, CreditCard, Loader2, Eye } from "lucide-react";
+import { ShieldCheck, CheckCircle, XCircle, GraduationCap, CreditCard, Loader2, Eye, Globe, Plus, Trash2 } from "lucide-react";
 
 interface PendingGuide {
     id: string;
@@ -37,6 +38,12 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+    // Edu Domains State
+    const [eduDomains, setEduDomains] = useState<string[]>([]);
+    const [newDomain, setNewDomain] = useState("");
+    const [isDomainsSaving, setIsDomainsSaving] = useState(false);
+    const [domainsLoaded, setDomainsLoaded] = useState(false);
 
     // Auth Guard — admin only
     useEffect(() => {
@@ -85,6 +92,26 @@ export default function AdminDashboard() {
         }
     }, [user, dbUser]);
 
+    // Fetch accepted edu domains
+    useEffect(() => {
+        const fetchDomains = async () => {
+            try {
+                const snap = await getDoc(doc(db, "settings", "accepted_edu_domains"));
+                if (snap.exists()) {
+                    setEduDomains(snap.data().domains || []);
+                }
+            } catch (error) {
+                console.error("Error fetching edu domains:", error);
+            } finally {
+                setDomainsLoaded(true);
+            }
+        };
+
+        if (user && dbUser?.role === "admin") {
+            fetchDomains();
+        }
+    }, [user, dbUser]);
+
     const handleGuideAction = async (guideId: string, action: "verified" | "rejected") => {
         setActionLoading(guideId);
         try {
@@ -114,6 +141,31 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleAddDomain = () => {
+        const domain = newDomain.trim().toLowerCase();
+        if (!domain || eduDomains.includes(domain)) return;
+        setEduDomains(prev => [...prev, domain]);
+        setNewDomain("");
+    };
+
+    const handleRemoveDomain = (domain: string) => {
+        setEduDomains(prev => prev.filter(d => d !== domain));
+    };
+
+    const handleSaveDomains = async () => {
+        setIsDomainsSaving(true);
+        try {
+            await setDoc(doc(db, "settings", "accepted_edu_domains"), {
+                domains: eduDomains,
+                updatedAt: serverTimestamp(),
+            });
+        } catch (error) {
+            console.error("Error saving edu domains:", error);
+        } finally {
+            setIsDomainsSaving(false);
+        }
+    };
+
     if (loading || dbUser?.role !== "admin") return null;
 
     return (
@@ -125,14 +177,14 @@ export default function AdminDashboard() {
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Admin Panel</h1>
                 </div>
-                <p className="text-slate-500 ml-13">Review and approve guide and customer verifications.</p>
+                <p className="text-slate-500 ml-13">Review verifications and manage platform settings.</p>
             </div>
 
             <Tabs defaultValue="guides" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <TabsList className="grid w-full grid-cols-3 mb-6 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl">
                     <TabsTrigger value="guides" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
                         <GraduationCap className="h-4 w-4" />
-                        Guide Verifications
+                        <span className="hidden sm:inline">Guide</span> Verifications
                         {pendingGuides.length > 0 && (
                             <span className="ml-1 h-5 min-w-5 px-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">
                                 {pendingGuides.length}
@@ -141,12 +193,16 @@ export default function AdminDashboard() {
                     </TabsTrigger>
                     <TabsTrigger value="nid" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
                         <CreditCard className="h-4 w-4" />
-                        NID Verifications
+                        <span className="hidden sm:inline">NID</span> Verifications
                         {pendingNids.length > 0 && (
                             <span className="ml-1 h-5 min-w-5 px-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">
                                 {pendingNids.length}
                             </span>
                         )}
+                    </TabsTrigger>
+                    <TabsTrigger value="domains" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                        <Globe className="h-4 w-4" />
+                        Edu Domains
                     </TabsTrigger>
                 </TabsList>
 
@@ -292,6 +348,76 @@ export default function AdminDashboard() {
                             ))}
                         </div>
                     )}
+                </TabsContent>
+
+                {/* ─── Edu Domains Management Tab ──────────────── */}
+                <TabsContent value="domains" className="mt-0">
+                    <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Accepted Edu Email Domains</h3>
+                            <p className="text-sm text-slate-500">
+                                Guides who sign up with an email from these domains are auto-verified (no admin review needed).
+                                Others must upload a Student ID for manual verification.
+                            </p>
+                        </div>
+
+                        {/* Add new domain */}
+                        <div className="flex gap-2 mb-6">
+                            <Input
+                                value={newDomain}
+                                onChange={(e) => setNewDomain(e.target.value)}
+                                placeholder="e.g. bracu.ac.bd"
+                                className="h-10 rounded-xl flex-1"
+                                onKeyDown={(e) => e.key === "Enter" && handleAddDomain()}
+                            />
+                            <Button onClick={handleAddDomain} className="rounded-xl h-10 gap-1.5" disabled={!newDomain.trim()}>
+                                <Plus className="h-4 w-4" />
+                                Add
+                            </Button>
+                        </div>
+
+                        {/* Domain list */}
+                        {!domainsLoaded ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                            </div>
+                        ) : eduDomains.length === 0 ? (
+                            <div className="text-center py-8 text-slate-400">
+                                <Globe className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No domains configured yet. Add your first accepted edu domain above, or go to <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">/dev/seed-admin</code> to seed the default list.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-1 max-h-80 overflow-y-auto">
+                                {eduDomains.map((domain) => (
+                                    <div
+                                        key={domain}
+                                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 group"
+                                    >
+                                        <code className="text-sm text-slate-700 dark:text-slate-300">{domain}</code>
+                                        <button
+                                            onClick={() => handleRemoveDomain(domain)}
+                                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all p-1 rounded-lg hover:bg-red-50"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Save button */}
+                        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <p className="text-xs text-slate-400">{eduDomains.length} domain{eduDomains.length !== 1 ? "s" : ""} configured</p>
+                            <Button
+                                onClick={handleSaveDomains}
+                                disabled={isDomainsSaving}
+                                className="rounded-xl bg-teal-600 hover:bg-teal-700 gap-2"
+                            >
+                                {isDomainsSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                                Save Changes
+                            </Button>
+                        </div>
+                    </Card>
                 </TabsContent>
             </Tabs>
 
