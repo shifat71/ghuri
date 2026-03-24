@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarIcon, Check, ChevronLeft, ChevronRight, X, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -20,6 +20,8 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 // Schemas
 const detailsSchema = z.object({
@@ -37,10 +39,14 @@ export interface BookingWizardProps {
 }
 
 export function BookingWizard({ guide, onClose }: BookingWizardProps) {
+    const { dbUser } = useAuth();
     const [step, setStep] = useState(1);
     const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const nidStatus = dbUser?.nidStatus || "not_submitted";
+    const isNidBlocked = nidStatus === "not_submitted" || nidStatus === "rejected";
 
     const form = useForm<any>({
         // @ts-ignore - Supress version mismatch between zod and hookform resolvers
@@ -124,7 +130,30 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                 {/* Dynamic Content Body */}
                 <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
 
-                    {step === 1 && (
+                    {/* NID Verification Gate */}
+                    {isNidBlocked && step === 1 && (
+                        <div className="flex flex-col items-center justify-center text-center py-8 space-y-4">
+                            <div className="h-16 w-16 bg-amber-100 rounded-full flex items-center justify-center mb-2">
+                                <ShieldAlert className="h-8 w-8 text-amber-600" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">NID Verification Required</h3>
+                            <p className="text-slate-500 max-w-sm text-sm">
+                                To protect both travelers and guides, you need to verify your National ID before booking. This is a one-time process.
+                            </p>
+                            <div className="flex flex-col gap-2 w-full max-w-xs pt-4">
+                                <Link href="/dashboard/customer" onClick={onClose}>
+                                    <Button size="lg" className="w-full h-12 rounded-xl bg-teal-600 hover:bg-teal-700">
+                                        Upload NID Now
+                                    </Button>
+                                </Link>
+                                <Button variant="ghost" onClick={onClose} className="rounded-xl text-slate-500">
+                                    Maybe Later
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 1 && !isNidBlocked && (
                         <div className="space-y-6">
                             <div>
                                 <h3 className="text-lg font-semibold mb-1">When are you traveling?</h3>
@@ -286,7 +315,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                 </div>
 
                 {/* Footer Navigation (Steps 1 & 2) */}
-                {step < 3 && (
+                {step < 3 && !isNidBlocked && (
                     <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center shrink-0">
                         <Button
                             variant="outline"

@@ -17,7 +17,8 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, GraduationCap } from "lucide-react";
+import { isStudentEmail } from "@/lib/verification";
 
 interface AuthModalProps {
     trigger?: React.ReactNode;
@@ -234,14 +235,27 @@ export function AuthModal({ trigger, defaultTab = 'signin' }: AuthModalProps) {
                                     onChange={(e) => setSignUpName(e.target.value)}
                                     required
                                 />
-                                <Input
-                                    type="email"
-                                    placeholder="Email address"
-                                    className="h-12 rounded-xl bg-slate-50"
-                                    value={signUpEmail}
-                                    onChange={(e) => setSignUpEmail(e.target.value)}
-                                    required
-                                />
+                                <div>
+                                    <Input
+                                        type="email"
+                                        placeholder="Email address"
+                                        className="h-12 rounded-xl bg-slate-50"
+                                        value={signUpEmail}
+                                        onChange={(e) => setSignUpEmail(e.target.value)}
+                                        required
+                                    />
+                                    {signUpEmail && isStudentEmail(signUpEmail) && (
+                                        <p className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1.5 ml-1">
+                                            <GraduationCap className="h-3.5 w-3.5" />
+                                            Student email detected — auto-verified!
+                                        </p>
+                                    )}
+                                    {signUpEmail && signUpEmail.includes("@") && !isStudentEmail(signUpEmail) && (
+                                        <p className="text-xs text-slate-400 mt-1.5 ml-1">
+                                            Use a .edu.bd or .ac.bd email for instant verification as a guide.
+                                        </p>
+                                    )}
+                                </div>
                                 <Input
                                     type="password"
                                     placeholder="Password"

@@ -2,17 +2,60 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if true;
+
+    // Helper: check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user is the document owner
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // Helper: check if user is an admin
+    function isAdmin() {
+      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ─── Users Collection ─────────────────────────────────
+    // Users can read/write their own doc. Admins can read all.
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if false; // No client-side deletes
+    }
+
+    // ─── Guides Collection ────────────────────────────────
+    // Public read (browse guides), only guide owner or admin can write.
+    match /guides/{guideId} {
+      allow read: if true;
+      allow create: if isOwner(guideId);
+      allow update: if isOwner(guideId) || isAdmin();
+      allow delete: if false;
+    }
+
+    // ─── Guide Posts ──────────────────────────────────────
+    // Public read, guide owner can create/update/delete own posts.
+    match /guide_posts/{postId} {
+      allow read: if true;
+      allow create: if isAuth();
+      allow update, delete: if isAuth() && resource.data.guideId == request.auth.uid;
+    }
+
+    // ─── Orders Collection ────────────────────────────────
+    // Customers can read their own orders. Guides can read orders assigned to them.
+    // Only authenticated users can create orders. Admins can read/update all.
+    match /orders/{orderId} {
+      allow read: if isAuth() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.guideId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuth();
+      allow update: if isAdmin() || (isAuth() && resource.data.guideId == request.auth.uid);
+      allow delete: if false;
     }
   }
 }

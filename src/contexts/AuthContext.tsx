@@ -18,6 +18,9 @@ export interface DbUser {
     email: string;
     photoURL?: string;
     phoneNumber?: string;
+    isStudentEmail?: boolean;
+    nidUrl?: string;
+    nidStatus?: 'not_submitted' | 'submitted' | 'verified' | 'rejected';
 }
 
 interface AuthContextType {
