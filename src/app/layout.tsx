@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getLocale } from 'next-intl/server';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,23 +18,28 @@ export const metadata: Metadata = {
   description: "Find and book Nogori Verified local travel guides in Bangladesh.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-1 pb-16 md:pb-0 relative">
-            {children}
-          </main>
-          <BottomNav />
-        </AuthProvider>
+        <NextIntlClientProvider messages={messages}>
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1 pb-16 md:pb-0 relative">
+              {children}
+            </main>
+            <BottomNav />
+          </AuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Bell, Menu, UserCircle, LogOut, LayoutDashboard, AlertCircle } from "lucide-react";
+import { Search, Bell, Menu, UserCircle, LogOut, LayoutDashboard, AlertCircle, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,6 +20,22 @@ import {
 
 export function NavbarClient() {
     const { user, dbUser, logout } = useAuth();
+    const t = useTranslations("Navbar");
+    const router = useRouter();
+    const [currentLang, setCurrentLang] = useState("bn");
+
+    useEffect(() => {
+        const isEn = document.cookie.includes('NEXT_LOCALE=en');
+        setCurrentLang(isEn ? 'EN' : 'BN');
+    }, []);
+
+    const toggleLanguage = () => {
+        const isEn = document.cookie.includes('NEXT_LOCALE=en');
+        const newLang = isEn ? 'bn' : 'en';
+        document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=31536000`;
+        setCurrentLang(newLang.toUpperCase());
+        router.refresh();
+    };
 
     // Determine dashboard link
     const dashboardLink = dbUser?.role ? `/dashboard/${dbUser.role}` : '/onboarding';
@@ -39,18 +58,23 @@ export function NavbarClient() {
                 {/* Center: Desktop Navigation */}
                 <nav className="hidden md:flex gap-6 text-sm font-medium">
                     <Link href="/destinations" className="transition-colors hover:text-primary">
-                        Destinations
+                        {t('destinations')}
                     </Link>
                     <Link href="/guides" className="transition-colors hover:text-primary">
-                        Find a Guide
+                        {t('findGuide')}
                     </Link>
                     <Link href="/how-it-works" className="transition-colors hover:text-primary text-muted-foreground">
-                        How it Works
+                        {t('howItWorks')}
                     </Link>
                 </nav>
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 md:gap-4">
+                    <Button variant="ghost" size="sm" onClick={toggleLanguage} className="rounded-full font-bold flex items-center gap-2 text-primary bg-primary/5 hover:bg-primary/10">
+                        <Languages className="h-4 w-4" />
+                        {currentLang}
+                    </Button>
+
                     <Button variant="ghost" size="icon" className="hidden sm:flex" aria-label="Search">
                         <Search className="h-5 w-5" />
                     </Button>
@@ -94,14 +118,14 @@ export function NavbarClient() {
                                             <LayoutDashboard className="mr-2 h-4 w-4" />
                                         )}
                                         <span className={!dbUser?.role ? "text-red-500 font-medium" : ""}>
-                                            {!dbUser?.role ? "Complete Setup" : "Dashboard"}
+                                            {!dbUser?.role ? t('completeSetup') : t('dashboard')}
                                         </span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={() => logout()}>
                                     <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
+                                    <span>{t('logout')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -109,11 +133,11 @@ export function NavbarClient() {
                         <div className="flex items-center gap-2">
                             <AuthModal
                                 defaultTab="signin"
-                                trigger={<Button variant="ghost" className="rounded-full font-medium px-4 hidden sm:flex">Log In</Button>}
+                                trigger={<Button variant="ghost" className="rounded-full font-medium px-4 hidden sm:flex">{t('login')}</Button>}
                             />
                             <AuthModal
                                 defaultTab="signup"
-                                trigger={<Button className="rounded-full font-medium px-6 hidden sm:flex">Sign Up</Button>}
+                                trigger={<Button className="rounded-full font-medium px-6 hidden sm:flex">{t('signup')}</Button>}
                             />
                         </div>
                     )}

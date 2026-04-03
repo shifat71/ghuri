@@ -1,205 +1,192 @@
-"use client";
-
-import { useState, useEffect, useCallback, useRef } from "react";
-import { AuthModal } from "@/components/auth/AuthModal";
 import Link from "next/link";
+import { ArrowRight, Camera, Map, MonitorSmartphone, Package, CheckCircle2, TrendingUp, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
+import { FeaturedGuides } from "@/components/home/FeaturedGuides";
+import { GlobalFeed } from "@/components/home/GlobalFeed";
 
+export default async function Home() {
+  const t = await getTranslations('Landing');
 
-const CAROUSEL_IMAGES = [
-  '/TeaGarden.jpg',
-  '/Sundarbans.jpg',
-  '/beach.jpg',
-  '/Saint.jpg',
-  '/Tangua.jpg',
-  '/farm.jpg',
-  '/rand.jpg',
-];
-
-
-
-function HeroCarousel() {
-  const [current, setCurrent] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Animation states
-  const [loaded, setLoaded] = useState(false);
-  const [showTagline, setShowTagline] = useState(false);
-  const [showDivider, setShowDivider] = useState(false);
-  const [showExplore, setShowExplore] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
-
-  useEffect(() => {
-    // Sequence delays
-    const t1 = setTimeout(() => setLoaded(true), 300);
-    const t2 = setTimeout(() => setShowTagline(true), 900);
-    const t3 = setTimeout(() => setShowDivider(true), 1400);
-    const t4 = setTimeout(() => setShowExplore(true), 1700);
-    const t5 = setTimeout(() => setShowAuth(true), 2000);
-
-    return () => {
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5);
-    };
-  }, []);
-
-  const next = useCallback(() => setCurrent(c => (c + 1) % CAROUSEL_IMAGES.length), []);
-
-  useEffect(() => {
-    timerRef.current = setInterval(next, 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [next]);
+  const CATEGORIES = [
+    {
+      title: t('catTourGuides'),
+      description: t('catTourDesc'),
+      icon: Map,
+      color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+    },
+    {
+      title: t('catPhotography'),
+      description: t('catPhotoDesc'),
+      icon: Camera,
+      color: "bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
+    },
+    {
+      title: t('catTech'),
+      description: t('catTechDesc'),
+      icon: MonitorSmartphone,
+      color: "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400"
+    },
+    {
+      title: t('catEveryday'),
+      description: t('catEverydayDesc'),
+      icon: Package,
+      color: "bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
+    }
+  ];
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
-
-      {CAROUSEL_IMAGES.map((src, i) => (
-        <div
-          key={i}
-          className="absolute inset-0"
-          style={{
-            opacity: i === current ? 1 : 0,
-            transition: "opacity 1.5s ease-in-out",
-            zIndex: i === current ? 1 : 0,
-            backgroundColor: "#3B4A2F",
-          }}
-        >
-          <img
-            src={src}
-            alt=""
-            className="w-screen h-screen object-cover absolute inset-0"
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+    <div className="min-h-screen flex flex-col pt-10 pb-24">
+      {/* ─── Hero Section ─── */}
+      <section className="relative px-4 pt-16 pb-24 max-w-7xl mx-auto text-center flex flex-col items-center">
+        <div className="absolute top-0 w-full h-[600px] bg-gradient-to-b from-teal-50/50 to-transparent dark:from-teal-900/10 -z-10 rounded-b-full blur-3xl opacity-60" />
+        
+        <div className="inline-flex items-center rounded-full border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/30 px-3 py-1 text-sm font-medium text-teal-800 dark:text-teal-300 mb-6 backdrop-blur-sm">
+          <span className="flex h-2 w-2 rounded-full bg-teal-600 dark:bg-teal-400 mr-2 animate-pulse"></span>
+          {t('badge1')}
         </div>
-      ))}
 
-
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6">
-
-        <Link href="/how-it-works" className="mb-5 cursor-pointer">
-          <p
-            className="flex text-6xl md:text-8xl font-black tracking-widest"
-            style={{
-              color: "#ffffff",
-              perspective: "1000px"
-            }}
-          >
-
-            {"Ghuri".split("").map((char, index) => (
-              <span
-                key={index}
-                style={{
-                  display: "inline-block",
-                  opacity: loaded ? 1 : 0,
-                  transform: loaded 
-                    ? 'translateY(0) scale(1) rotateX(0deg)' 
-                    : 'translateY(60px) scale(0.5) rotateX(90deg)',
-                  transition: `opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${100 + index * 100}ms, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${100 + index * 100}ms`,
-                }}
-              >
-                {char}
-              </span>
-            ))}
-          </p>
-        </Link>
-
-
-        <h1
-          className="text-4xl md:text-6xl font-bold text-white text-center leading-tight max-w-[700px]"
-          style={{
-            fontFamily: "Georgia, 'Times New Roman', serif",
-            textShadow: "0 2px 20px rgba(0,0,0,0.4)",
-          }}
-        >
-          {"Travel Bangladesh with Nogori Verified Locals.".split(" ").map((word, index) => (
-            <span
-              key={index}
-              style={{
-                display: "inline-block",
-                marginRight: "0.25em",
-                opacity: showTagline ? 1 : 0,
-                transform: showTagline ? 'translateY(0)' : 'translateY(30px)',
-                transition: `opacity 0.9s ease ${900 + index * 100}ms, transform 0.9s ease ${900 + index * 100}ms`,
-              }}
-            >
-              {word}
-            </span>
-          ))}
+        <h1 className="mt-8 text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-tight max-w-4xl">
+          {t('heroTitle1')} 
+          <span className="text-teal-600 dark:text-teal-400 relative inline-block">
+            {t('heroTitle2')}
+            <svg className="absolute w-full h-3 -bottom-1 left-0 text-teal-300 dark:text-teal-800" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="transparent"/></svg>
+          </span>
         </h1>
+        
+        <p className="mt-6 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
+          {t('heroSubtitle')}
+        </p>
 
-
-        <div
-          className="my-6 rounded-full"
-          style={{
-            width: showDivider ? "80px" : "0px",
-            height: "2px",
-            backgroundColor: "#6B7C3F",
-            transition: "width 0.8s ease",
-          }}
-        />
-
-
-        <Link href="/destinations" passHref>
-          <button
-            className="border-2 border-white text-white rounded-full px-8 py-3 font-medium text-sm md:text-base transition-all duration-300 hover:bg-[#6B7C3F] hover:border-[#6B7C3F] cursor-pointer"
-            style={{
-              letterSpacing: "0.05em",
-              opacity: showExplore ? 1 : 0,
-              transform: showExplore ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)',
-              transition: 'opacity 0.7s ease, transform 0.7s ease, background-color 0.3s, border-color 0.3s',
-            }}
-          >
-            Explore
-          </button>
-        </Link>
-
-        {/* Auth buttons */}
-        <div
-          className="flex items-center gap-4 mt-8"
-          style={{
-            opacity: showAuth ? 1 : 0,
-            transform: showAuth ? 'translateY(0)' : 'translateY(15px)',
-            transition: 'opacity 0.7s ease, transform 0.7s ease',
-          }}
-        >
-          <AuthModal
-            defaultTab="signin"
-            trigger={
-              <button
-                className="border-2 border-white text-white rounded-full px-6 py-2 text-sm font-medium transition-all duration-300 hover:bg-white/10 cursor-pointer"
-              >
-                Log In
-              </button>
-            }
-          />
-          <AuthModal
-            defaultTab="signup"
-            trigger={
-              <button
-                className="rounded-full px-6 py-2 text-sm font-medium text-white transition-all duration-300 hover:opacity-90 cursor-pointer border-2 border-transparent"
-                style={{ backgroundColor: "#6B7C3F" }}
-              >
-                Sign Up
-              </button>
-            }
-          />
+        <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
+          <Link href="/guides" className="w-full">
+            <Button size="lg" className="w-full h-14 text-lg rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/25 transition-all">
+              <Search className="mr-2 h-5 w-5" />
+              {t('exploreTalent')}
+            </Button>
+          </Link>
+          <Link href="/how-it-works" className="w-full">
+            <Button size="lg" variant="outline" className="w-full h-14 text-lg rounded-full border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900">
+              {t('howItWorks')}
+            </Button>
+          </Link>
         </div>
-      </div>
+      </section>
+
+      {/* ─── Service Categories ─── */}
+      <section className="px-4 py-20 bg-slate-50 dark:bg-slate-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{t('categoriesTitle')}</h2>
+            <p className="text-slate-500 mt-4 max-w-xl mx-auto">{t('categoriesSubtitle')}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CATEGORIES.map((category) => (
+              <div 
+                key={category.title} 
+                className="group relative bg-white dark:bg-slate-950 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              >
+                <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${category.color}`}>
+                  <category.icon className="h-7 w-7" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{category.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{category.description}</p>
+                
+                <div className="mt-6 flex items-center text-sm font-semibold text-teal-600 dark:text-teal-400 opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-10px] group-hover:translate-x-0 duration-300">
+                  {t('exploreTalent')} <ArrowRight className="ml-1 h-4 w-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── How it Works Timeline ─── */}
+      <section className="px-4 py-24 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-6">{t('timelineTitle')}</h2>
+            <p className="text-slate-500 text-lg mb-10 leading-relaxed">
+              {t('timelineSubtitle')}
+            </p>
+
+            <div className="space-y-8">
+              {[
+                { step: "01", title: t('step1'), desc: t('step1Desc') },
+                { step: "02", title: t('step2'), desc: t('step2Desc') },
+                { step: "03", title: t('step3'), desc: t('step3Desc') }
+              ].map((item, idx) => (
+                <div key={idx} className="flex gap-6">
+                  <div className="flex flex-col items-center">
+                    <div className="h-12 w-12 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold border border-teal-100 dark:border-teal-800 shrink-0">
+                      {item.step}
+                    </div>
+                    {idx !== 2 && <div className="w-[2px] h-full bg-slate-100 dark:bg-slate-800 my-2" />}
+                  </div>
+                  <div className="pb-8">
+                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{item.title}</h4>
+                    <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="relative">
+            <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative bg-slate-900 border border-slate-800">
+              <img src="/beach.jpg" alt="Student at work" className="w-full h-full object-cover opacity-70" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
+              
+              <div className="absolute bottom-8 left-8 right-8">
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                    <span className="text-white font-medium text-lg">{t('jobBadge1')}</span>
+                  </div>
+                  <p className="text-slate-300 text-sm">"Incredible photography skills. Highly recommend hiring verified students!"</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Floating widget */}
+            <div className="absolute -left-12 top-1/4 bg-white dark:bg-slate-950 p-5 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 hidden md:block animate-bounce" style={{animationDuration: '3s'}}>
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">{t('jobBadge2')}</p>
+                  <p className="text-xs text-slate-500">Fast & Secure</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Featured Talent ─── */}
+      <section className="px-4 py-20 bg-white dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{t('featuredTitle')}</h2>
+            <p className="text-slate-500 mt-4 max-w-xl mx-auto">{t('featuredDesc')}</p>
+          </div>
+          <FeaturedGuides />
+        </div>
+      </section>
+
+      {/* ─── Global Feed ─── */}
+      <section className="px-4 py-20 bg-slate-50 dark:bg-slate-900/50">
+         <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{t('recentActivityTitle')}</h2>
+            <p className="text-slate-500 mt-4 max-w-xl mx-auto">{t('recentActivityDesc')}</p>
+          </div>
+          <GlobalFeed />
+        </div>
+      </section>
+
     </div>
-  );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
-export default function Home() {
-  return (
-    <>
-      {/* Hide navbar on landing page only */}
-      <style>{`
-                nav, header { display: none !important; }
-            `}</style>
-
-      <HeroCarousel />
-    </>
   );
 }

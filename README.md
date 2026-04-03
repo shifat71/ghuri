@@ -1,182 +1,94 @@
-<p align="center">
-  <img src="assets/logo.png" alt="Ghuri Logo" width="180" />
-</p>
-
-<h1 align="center">ঘুরি (Ghuri)</h1>
-
-<p align="center">
-  <strong>Trusted & Nogori Verified Travel Guides — Discover Local. Travel Authentic.</strong>
-</p>
-
-<p align="center">
-  <a href="#features">Features</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#documentation">Docs</a> •
-  <a href="#roadmap">Roadmap</a>
-</p>
+<div align="center">
+  <h1>Ghuri (ঘুরি)</h1>
+  <p><strong>A Platform for Verified Student Talent</strong></p>
+  <p>Hire students as travel guides, photographers, videographers, tech experts, and for everyday services.</p>
+</div>
 
 ---
 
-## What is Ghuri?
+## 🎯 About Ghuri.to
 
-**Ghuri (ঘুরি)** — Bengali for _"to wander"_ — is a marketplace connecting travelers with **Nogori (নগরী) verified** freelance travel guides across Bangladesh. Think **Fiverr meets TripAdvisor** for local tourism.
+**Ghuri** is a trusted ecosystem dedicated to connecting you with verified student talent across Bangladesh. Whether you need a local travel guide, an event photographer, or reliable technical support, Ghuri ensures you get high-quality services while empowering students to earn and grow.
 
-Every guide carries the **🛡️ Nogori Verified** badge — background-checked, manually screened, and endorsed by our ops team. Travelers browse profiles, explore portfolios, and book experiences. Orders are routed to **WhatsApp Business** where our team confirms and connects both parties.
-
-> **🤖 Developers & AI Agents:** Read the [`/docs`](docs/) folder before writing code. Start with the **[AI Build Guide](docs/06-ai-build-guide.md)**.
+To ensure safety and reliability, **every service provider is verified**. Students are authenticated via `.edu.bd` emails and manual Student ID checks, granting them the trusted **Nogori Verified** badge.
 
 ---
 
-## How It Works
+## ✨ Core Features
 
-1. **Browse** — Explore destinations & Nogori Verified guides
-2. **Choose** — View profiles, portfolios & service packages
-3. **Book** — Select dates, pick services, fill trip details
-4. **Connect** — Order auto-sent to WhatsApp Business; ops team confirms & creates a group chat
-5. **Experience** — Meet your guide & explore
-6. **Review** — Rate the trip; guide builds reputation
+### 🛡️ Robust Verification System
+- **Guide/Student Verification:** Auto-verification for valid university emails (`.edu.bd` / `.ac.bd`) or manual review of Student IDs by admins.
+- **Customer Verification:** Secure NID upload and approval workflows before customers can make bookings.
 
----
+### 🏪 Comprehensive Service Marketplace
+- **Dynamic Portfolios:** Verified students can set up profiles and storefronts for services like guided tours, photography, and hotel bookings.
+- **Flexible Pricing:** Support for `per_day`, `per_person`, or `fixed` pricing depending on the service.
+- **Social Feed:** Service providers can share images and videos of their work directly on their profile to attract clients.
 
-## Features
+### 📅 Seamless Booking Flow
+- **4-Step Wizard:** Select dates → pick services → provide trip details → instant booking creation.
+- **Real-time Price Engine:** Automatically calculate costs based on dates and selected service bundles.
 
-**For Travelers**
-- 🛡️ Nogori Verified guides only — book with confidence
-- 🔍 Search by destination, language, rating, price & availability
-- 📦 Curated packages — city tours, treks, photography & more
-- 💬 WhatsApp-first communication — no new app needed
-- 🤝 Escrow payments — funds released only after a successful trip
-- ⭐ Reviews, ratings, favorites & wishlists
-
-**For Guides**
-- 🏅 Trust tiers: Verified → Pro → Elite
-- 🏪 Professional storefront with portfolio showcase
-- 🎯 List multiple services with transparent pricing
-- 📊 Dashboard with analytics, earnings & Nogori Score
-
-**Platform**
-- 🔐 Firebase Auth (Email, Google, Phone OTP)
-- 🌐 Bilingual — Bangla & English
-- 📱 Mobile-first responsive PWA
-- 🗺️ Google Maps integration
-- 📈 Admin dashboard for managing the entire platform
+### 📊 Dedicated Dashboards
+- **Customer Dashboard:** Track upcoming trips, past orders, expenditures, and NID verification status.
+- **Guide Dashboard:** Manage bookings, view pending earnings, and track platform fees.
+- **Admin Panel:** Centralized hub for reviewing Student IDs and NIDs to approve or reject users safely.
 
 ---
 
-## Tech Stack
+## 🛠 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | Next.js 14 (App Router), React 18, Tailwind CSS, Shadcn/UI |
-| **Backend** | Firebase (Auth, Firestore, Storage, Cloud Functions) |
-| **Messaging** | WhatsApp Business API |
-| **Maps** | Google Maps JavaScript API |
-| **Payments** | bKash / SSLCommerz (BD) — Stripe (International) |
-| **CI/CD** | GitHub Actions → Firebase Hosting |
+- **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS 4, Shadcn/UI (Radix)
+- **Backend & Auth**: Firebase (Authentication, Firestore, Storage)
+- **Forms & Validation**: React Hook Form + Zod
+- **Maps**: React-Leaflet & OpenStreetMap (No Google API keys needed)
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js ≥ 18 · pnpm · Firebase CLI (`npm i -g firebase-tools`)
-- Firebase project with Firestore, Auth, Storage & Functions enabled
-
-### Setup
-
+### 1. Clone & Install
 ```bash
 git clone https://github.com/shifat71/ghuri.git
 cd ghuri
 pnpm install
-cp .env.example .env.local   # fill in your keys
 ```
 
-### Environment Variables
-
+### 2. Environment Setup
+Create a `.env.local` file in the root directory:
 ```env
-# Firebase
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-
-# WhatsApp Business API
-WHATSAPP_BUSINESS_PHONE_ID=
-WHATSAPP_ACCESS_TOKEN=
-
-# Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
-
-# Payments
-SSLCOMMERZ_STORE_ID=
-SSLCOMMERZ_STORE_PASSWORD=
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
-### Development
-
+### 3. Run Development Server
 ```bash
-pnpm dev                          # Next.js dev server
-firebase emulators:start          # Local Firebase emulators
-firebase deploy --only functions  # Deploy Cloud Functions
-firebase deploy --only hosting    # Deploy to Hosting
+pnpm dev
+```
+Navigate to `http://localhost:3000` to preview the marketplace. **Note:** Go to `/dev/seed-admin` locally to elevate your account to an admin for testing verification features.
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── app/               # Next.js App Router (pages: guides, dashboards, admin)
+├── components/        # Reusable UI (Auth, Booking Wizards, Guide Cards)
+├── contexts/          # React Context (AuthContext)
+└── lib/               # Utilities & Firebase initialization
 ```
 
----
+## 📖 Documentation
 
-## Documentation
-
-Detailed technical docs live in the [`/docs`](docs/) folder:
-
-| Doc | Contents |
-|---|---|
-| [01 — PRD](docs/01-prd.md) | Product requirements & feature specs |
-| [02 — System Architecture](docs/02-system-architecture.md) | Architecture, project structure & data flow |
-| [03 — Database Schema](docs/03-database-schema.md) | Firestore collections & schema definitions |
-| [04 — API & Integrations](docs/04-api-and-integrations.md) | WhatsApp, payments, maps & external APIs |
-| [05 — UI/UX Guidelines](docs/05-ui-ux-guidelines.md) | Page-by-page design specs & component details |
-| [06 — AI Build Guide](docs/06-ai-build-guide.md) | Step-by-step implementation guide for AI agents |
+For in-depth architecture decisions, database schemas, and AI build constraints, please refer to the markdown files in the [`/docs`](./docs) and [`progress.md`](./progress.md) files.
 
 ---
-
-## Roadmap
-
-| Phase | Focus | Key Milestones |
-|---|---|---|
-| **1 — MVP** | Core platform | Auth, guide profiles, Nogori Verification, booking flow, WhatsApp integration |
-| **2 — Growth** | Engagement | Reviews & ratings, destination pages, maps, admin panel, i18n (Bangla) |
-| **3 — Monetize** | Revenue | bKash/SSLCommerz payments, commissions, subscriptions, push notifications |
-| **4 — Scale** | Expansion | South Asia expansion, native mobile apps, real-time chat, public API |
-
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit & push
-4. Open a Pull Request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
----
-
-## License
-
-[MIT](LICENSE)
-
----
-
-## Contact
-
-[ghuri.app](https://ghuri.app) *(coming soon)* · hello@ghuri.app · [@ghuriapp](https://instagram.com/ghuriapp)
-
----
-
 <p align="center">
-  Made with ❤️ in Bangladesh 🇧🇩<br/>
-  <em>ঘুরি — Trusted & Nogori Verified guides for your next adventure.</em>
+  Made with ❤️ in Bangladesh 🇧🇩<br>
+  <em>Empowering students, one service at a time.</em>
 </p>
