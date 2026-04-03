@@ -1,23 +1,9 @@
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { GuideCardProps } from "@/components/guide/GuideCard";
 import { Compass } from "lucide-react";
-import { GuideSearchClient } from "./GuideSearchClient";
+import { GuidesPageClient } from "./GuidesPageClient";
 
 export const dynamic = 'force-dynamic';
 
-export default async function GuidesPage() {
-    let guides: GuideCardProps[] = [];
-    try {
-        const querySnapshot = await getDocs(collection(db, "guides"));
-        guides = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        })) as GuideCardProps[];
-    } catch (error) {
-        console.error("Error fetching guides server-side:", error);
-    }
-
+export default function GuidesPage() {
     return (
         <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-900 pb-20">
 
@@ -32,15 +18,7 @@ export default async function GuidesPage() {
             </div>
 
             <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 -mt-8 relative z-10">
-                {guides.length > 0 ? (
-                    <GuideSearchClient initialGuides={guides} />
-                ) : (
-                    <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center shadow-sm border border-slate-100 dark:border-slate-700 mt-8">
-                        <Compass className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No guides available</h3>
-                        <p className="text-slate-500">We couldn't find any verified guides in the database right now.</p>
-                    </div>
-                )}
+                <GuidesPageClient />
             </div>
         </div>
     );
