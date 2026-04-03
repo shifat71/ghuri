@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 import { FeaturedGuides } from "@/components/home/FeaturedGuides";
 import { GlobalFeed } from "@/components/home/GlobalFeed";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
 
 export default async function Home() {
   const t = await getTranslations('Landing');
@@ -36,40 +37,39 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col pt-10 pb-24">
+    <div className="min-h-screen flex flex-col pb-24">
       {/* ─── Hero Section ─── */}
-      <section className="relative px-4 pt-16 pb-24 max-w-7xl mx-auto text-center flex flex-col items-center">
-        <div className="absolute top-0 w-full h-[600px] bg-gradient-to-b from-teal-50/50 to-transparent dark:from-teal-900/10 -z-10 rounded-b-full blur-3xl opacity-60" />
-        
-        <div className="inline-flex items-center rounded-full border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/30 px-3 py-1 text-sm font-medium text-teal-800 dark:text-teal-300 mb-6 backdrop-blur-sm">
-          <span className="flex h-2 w-2 rounded-full bg-teal-600 dark:bg-teal-400 mr-2 animate-pulse"></span>
-          {t('badge1')}
-        </div>
+      <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center text-center overflow-hidden">
+        {/* Background carousel */}
+        <HeroCarousel />
 
-        <h1 className="mt-8 text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-tight max-w-4xl">
-          {t('heroTitle1')} 
-          <span className="text-teal-600 dark:text-teal-400 relative inline-block">
-            {t('heroTitle2')}
-            <svg className="absolute w-full h-3 -bottom-1 left-0 text-teal-300 dark:text-teal-800" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="transparent"/></svg>
-          </span>
-        </h1>
-        
-        <p className="mt-6 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-          {t('heroSubtitle')}
-        </p>
+        {/* Content */}
+        <div className="relative z-10 px-4 py-24 max-w-4xl mx-auto flex flex-col items-center">
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight">
+            {t('heroTitle1')}
+            <span className="text-teal-300 relative inline-block">
+              {t('heroTitle2')}
+              <svg className="absolute w-full h-3 -bottom-1 left-0 text-teal-500" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="transparent"/></svg>
+            </span>
+          </h1>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
-          <Link href="/guides" className="w-full">
-            <Button size="lg" className="w-full h-14 text-lg rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/25 transition-all">
-              <Search className="mr-2 h-5 w-5" />
-              {t('exploreTalent')}
-            </Button>
-          </Link>
-          <Link href="/how-it-works" className="w-full">
-            <Button size="lg" variant="outline" className="w-full h-14 text-lg rounded-full border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900">
-              {t('howItWorks')}
-            </Button>
-          </Link>
+          <p className="mt-6 text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed">
+            {t('heroSubtitle')}
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md">
+            <Link href="/guides" className="w-full">
+              <Button size="lg" className="w-full h-14 text-lg rounded-full bg-teal-500 hover:bg-teal-400 text-white shadow-lg shadow-teal-500/30 transition-all">
+                <Search className="mr-2 h-5 w-5" />
+                {t('exploreTalent')}
+              </Button>
+            </Link>
+            <Link href="/how-it-works" className="w-full">
+              <Button size="lg" variant="outline" className="w-full h-14 text-lg rounded-full border-white/30 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm">
+                {t('howItWorks')}
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
