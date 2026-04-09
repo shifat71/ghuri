@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -67,7 +67,7 @@ export default function GuideNotificationsPage() {
     return (
         <div className="max-w-4xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Notifications & Insights</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Notifications & Insights</h1>
                 <p className="text-slate-500">Stay updated with your bookings and get AI-powered smart suggestions to grow your business.</p>
             </div>
 
@@ -81,12 +81,12 @@ export default function GuideNotificationsPage() {
                     {suggestions.map((item) => (
                         <Card key={item.id} className="p-5 rounded-3xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex gap-4">
-                                <div className="mt-1 h-10 w-10 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-sm border border-slate-100 dark:border-slate-800">
+                                <div className="mt-1 h-10 w-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm border border-slate-100">
                                     {item.icon}
                                 </div>
                                 <div className="space-y-1">
-                                    <h4 className="font-bold text-slate-900 dark:text-white">{item.title}</h4>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
+                                    <h4 className="font-bold text-slate-900">{item.title}</h4>
+                                    <p className="text-sm text-slate-600">{item.description}</p>
                                     <div className="flex items-center justify-between pt-2">
                                         <span className="text-xs text-slate-400 font-medium">{item.time}</span>
                                         <button className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
@@ -107,10 +107,10 @@ export default function GuideNotificationsPage() {
                     </h3>
                     <div className="space-y-3">
                         {notifications.map((notif) => (
-                            <div key={notif.id} className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 flex gap-4">
+                            <div key={notif.id} className="p-4 bg-white rounded-2xl border border-slate-100 flex gap-4">
                                 <div className="mt-1 shrink-0">{notif.icon}</div>
                                 <div>
-                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">{notif.title}</h4>
+                                    <h4 className="font-bold text-sm text-slate-900">{notif.title}</h4>
                                     <p className="text-sm text-slate-500 mb-1">{notif.description}</p>
                                     <span className="text-xs text-slate-400 font-medium">{notif.time}</span>
                                 </div>

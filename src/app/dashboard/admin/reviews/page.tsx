@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,7 +84,7 @@ export default function AdminReviewsPage() {
     return (
         <div className="max-w-6xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Review Moderation</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Review Moderation</h1>
                 <p className="text-slate-500">Monitor platform feedback, remove spam, and handle flagged reviews.</p>
             </div>
 
@@ -95,7 +95,7 @@ export default function AdminReviewsPage() {
                         placeholder="Search review texts or guides..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 h-12 bg-white dark:bg-slate-900 rounded-xl border-slate-200 shadow-sm"
+                        className="pl-10 h-12 bg-white rounded-xl border-slate-200 shadow-sm"
                     />
                 </div>
             </div>
@@ -106,7 +106,7 @@ export default function AdminReviewsPage() {
                         <p className="text-slate-500">No reviews found.</p>
                     </Card>
                 ) : filteredReviews.map((review) => (
-                    <Card key={review.id} className={`p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-6 ${review.status === 'flagged' ? 'bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50' : ''}`}>
+                    <Card key={review.id} className={`p-6 rounded-3xl border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 ${review.status === 'flagged' ? 'bg-red-50/50 border-red-200/50' : ''}`}>
                         <div className="flex-1 space-y-4">
                             <div className="flex items-start justify-between">
                                 <div>
@@ -133,13 +133,13 @@ export default function AdminReviewsPage() {
                                 </Badge>
                             </div>
 
-                            <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl text-slate-700 dark:text-slate-300 italic border border-slate-100 dark:border-slate-800 relative">
-                                {review.status === 'flagged' && <MessageSquareWarning className="absolute -top-3 -right-3 h-6 w-6 text-red-500 bg-white dark:bg-slate-950 rounded-full" />}
+                            <div className="p-4 bg-slate-50 rounded-xl text-slate-700 italic border border-slate-100 relative">
+                                {review.status === 'flagged' && <MessageSquareWarning className="absolute -top-3 -right-3 h-6 w-6 text-red-500 bg-white rounded-full" />}
                                 "{review.comment}"
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 min-w-[140px] border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 justify-center">
+                        <div className="flex flex-col gap-2 min-w-[140px] border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6 justify-center">
                             {review.status === 'flagged' && (
                                 <Button onClick={() => handleAction(review.id, 'published')} variant="outline" className="w-full text-emerald-600 border-emerald-200 hover:bg-emerald-50 h-10 rounded-xl">
                                     <CheckCircle2 className="h-4 w-4 mr-2" /> Approve

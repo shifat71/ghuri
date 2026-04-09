@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -112,7 +112,7 @@ export function CreatePost({ onPostCreated }: CreatePostProps) {
     };
 
     return (
-        <Card className="p-4 md:p-5 rounded-2xl md:rounded-3xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <Card className="p-4 md:p-5 rounded-2xl md:rounded-3xl border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="flex gap-3">
                 {/* Avatar */}
                 <div className="h-10 w-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 text-sm font-bold border border-teal-100">
@@ -129,7 +129,7 @@ export function CreatePost({ onPostCreated }: CreatePostProps) {
 
                     {/* Media Preview */}
                     {mediaPreview && (
-                        <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <div className="relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                             <button
                                 onClick={clearMedia}
                                 className="absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
@@ -155,7 +155,7 @@ export function CreatePost({ onPostCreated }: CreatePostProps) {
 
                     {/* Upload Progress */}
                     {isPosting && uploadProgress > 0 && uploadProgress < 100 && (
-                        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                             <div
                                 className="bg-teal-500 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${uploadProgress}%` }}
@@ -164,7 +164,7 @@ export function CreatePost({ onPostCreated }: CreatePostProps) {
                     )}
 
                     {/* Actions Row */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                         <div className="flex items-center gap-1">
                             <input
                                 ref={fileInputRef}

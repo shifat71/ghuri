@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -100,7 +100,7 @@ export default function ExploreMap({ guides, onBook }: ExploreMapProps) {
             center={defaultCenter}
             zoom={7}
             style={{ height: "600px", width: "100%", borderRadius: "2rem" }}
-            className="z-0 border-4 border-white dark:border-slate-800 shadow-2xl"
+            className="z-0 border-4 border-white shadow-2xl"
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -1,31 +1,41 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Home, Search, Calendar, User } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const NAV_ITEMS = [
+    { href: "/", label: "Explore", icon: Home },
+    { href: "/guides", label: "Search", icon: Search },
+    { href: "/dashboard/customer", label: "Bookings", icon: Calendar },
+    { href: "/dashboard/customer/profile", label: "Profile", icon: User },
+];
 
 export function BottomNav() {
+    const pathname = usePathname();
+
     return (
-        <div className="fixed bottom-0 left-0 z-50 w-full md:hidden h-16 bg-white/80 backdrop-blur-md border-t border-slate-200 dark:bg-slate-900/80 dark:border-slate-800 pb-safe">
-            <div className="grid h-full w-full grid-cols-4 px-2">
-
-                <Link href="/" className="inline-flex flex-col items-center justify-center gap-1 hover:text-primary text-primary">
-                    <Home className="h-5 w-5" />
-                    <span className="text-[10px] font-medium">Explore</span>
-                </Link>
-
-                <Link href="/search" className="inline-flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary dark:text-slate-400">
-                    <Search className="h-5 w-5" />
-                    <span className="text-[10px] font-medium">Search</span>
-                </Link>
-
-                <Link href="/customer/dashboard" className="inline-flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary dark:text-slate-400">
-                    <Calendar className="h-5 w-5" />
-                    <span className="text-[10px] font-medium">Bookings</span>
-                </Link>
-
-                <Link href="/customer/profile" className="inline-flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary dark:text-slate-400">
-                    <User className="h-5 w-5" />
-                    <span className="text-[10px] font-medium">Profile</span>
-                </Link>
-
+        <div className="fixed bottom-0 left-0 z-50 w-full md:hidden h-16 bg-white border-t border-gray-100 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+            <div className="grid h-full w-full grid-cols-4">
+                {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+                    const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
+                    return (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={cn(
+                                "inline-flex flex-col items-center justify-center gap-1 transition-colors",
+                                isActive ? "text-[#067c18]" : "text-gray-400 hover:text-gray-600"
+                            )}
+                        >
+                            <Icon className={cn("h-5 w-5", isActive && "stroke-[2.5]")} />
+                            <span className={cn("text-[10px] font-semibold", isActive ? "text-[#067c18]" : "text-gray-400")}>
+                                {label}
+                            </span>
+                        </Link>
+                    );
+                })}
             </div>
         </div>
     );

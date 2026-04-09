@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -59,12 +59,12 @@ export default function AdminSettingsPage() {
     return (
         <div className="max-w-4xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Platform Settings & Pricing</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Platform Settings & Pricing</h1>
                 <p className="text-slate-500">Configure global service charges and commission percentages.</p>
             </div>
 
             <form onSubmit={handleSave}>
-                <Card className="rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <Card className="rounded-3xl border-slate-200 shadow-sm overflow-hidden">
                     <div className="p-6 md:p-8 space-y-8">
 
                         <div className="space-y-6">
@@ -78,7 +78,7 @@ export default function AdminSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl gap-6 md:grid-cols-2">
+                            <div className="grid grid-cols-1 bg-slate-50 p-6 rounded-2xl gap-6 md:grid-cols-2">
                                 <div className="space-y-4">
                                     <Label className="text-sm font-bold uppercase tracking-wider text-slate-500">Minimum Daily Rate (৳)</Label>
                                     <Input
@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
                                         min={0}
                                         value={settings.minCharge}
                                         onChange={(e) => setSettings({ ...settings, minCharge: Number(e.target.value) })}
-                                        className="h-12 text-lg font-bold bg-white dark:bg-slate-950 rounded-xl"
+                                        className="h-12 text-lg font-bold bg-white rounded-xl"
                                     />
                                 </div>
                                 <div className="space-y-4">
@@ -98,13 +98,13 @@ export default function AdminSettingsPage() {
                                         min={settings.minCharge}
                                         value={settings.maxCharge}
                                         onChange={(e) => setSettings({ ...settings, maxCharge: Number(e.target.value) })}
-                                        className="h-12 text-lg font-bold bg-white dark:bg-slate-950 rounded-xl"
+                                        className="h-12 text-lg font-bold bg-white rounded-xl"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="space-y-6 pt-6 border-t border-slate-100">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                                     <Percent className="h-5 w-5" />
@@ -131,7 +131,7 @@ export default function AdminSettingsPage() {
                         </div>
 
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-900/80 p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                    <div className="bg-slate-50 p-6 border-t border-slate-100 flex justify-end">
                         <Button type="submit" disabled={isSaving} className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold min-w-[150px]">
                             {isSaving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : "Save Configuration"}
                         </Button>

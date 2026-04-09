@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrders } from "@/hooks/useOrders";
@@ -33,7 +33,7 @@ export default function CustomerNotificationsPage() {
         <div className="max-w-3xl space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Notifications</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Notifications</h1>
                     <p className="text-slate-500">Stay up to date on your bookings and trips.</p>
                 </div>
                 {notifications.length > 0 && (
@@ -44,7 +44,7 @@ export default function CustomerNotificationsPage() {
             </div>
 
             {ordersLoading ? (
-                <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />)}</div>
+                <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 rounded-2xl bg-slate-100 animate-pulse" />)}</div>
             ) : notifications.length === 0 ? (
                 <Card className="p-16 text-center rounded-3xl border-dashed border-slate-200">
                     <Bell className="h-10 w-10 text-slate-300 mx-auto mb-3" />
@@ -53,12 +53,12 @@ export default function CustomerNotificationsPage() {
             ) : (
                 <div className="space-y-3">
                     {notifications.map(notif => (
-                        <div key={notif.id} className="flex gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:shadow-sm transition-shadow">
-                            <div className="mt-0.5 shrink-0 h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                        <div key={notif.id} className="flex gap-4 p-4 bg-white rounded-2xl border border-slate-100 hover:shadow-sm transition-shadow">
+                            <div className="mt-0.5 shrink-0 h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center">
                                 {notif.icon}
                             </div>
                             <div className="flex-1">
-                                <p className="font-bold text-slate-900 dark:text-white text-sm">{notif.title}</p>
+                                <p className="font-bold text-slate-900 text-sm">{notif.title}</p>
                                 <p className="text-sm text-slate-500 mt-0.5">{notif.description}</p>
                                 <p className="text-xs text-slate-400 font-medium mt-1">{notif.time}</p>
                             </div>

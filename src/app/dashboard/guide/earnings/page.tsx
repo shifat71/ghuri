@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,7 +93,7 @@ export default function GuideEarningsPage() {
         <div className="max-w-5xl space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Earnings</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Earnings</h1>
                     <p className="text-slate-500">Track your revenue and manage payouts.</p>
                 </div>
                 <Button variant="outline" className="rounded-xl flex items-center gap-2 font-bold w-fit">
@@ -103,7 +103,7 @@ export default function GuideEarningsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-gradient-to-br from-teal-600 to-teal-800 text-white">
+                <Card className="p-6 rounded-3xl border-slate-200 shadow-sm bg-gradient-to-br from-teal-600 to-teal-800 text-white">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
                             <Wallet2 className="h-6 w-6" />
@@ -112,16 +112,16 @@ export default function GuideEarningsPage() {
                     </div>
                     <p className="text-4xl font-black">৳{stats.totalEarnings.toLocaleString()}</p>
                 </Card>
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <Card className="p-6 rounded-3xl border-slate-200 shadow-sm">
                     <div className="flex items-center gap-4 mb-4 text-slate-500">
                         <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center">
                             <TrendingUp className="h-6 w-6 text-slate-600" />
                         </div>
                         <span className="font-bold tracking-wide uppercase text-sm">This Month</span>
                     </div>
-                    <p className="text-4xl font-black text-slate-900 dark:text-white">৳{stats.monthlyEarnings.toLocaleString()}</p>
+                    <p className="text-4xl font-black text-slate-900">৳{stats.monthlyEarnings.toLocaleString()}</p>
                 </Card>
-                <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <Card className="p-6 rounded-3xl border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4 text-slate-500">
                             <div className="h-12 w-12 rounded-full bg-amber-50 flex items-center justify-center">
@@ -137,7 +137,7 @@ export default function GuideEarningsPage() {
                 </Card>
             </div>
 
-            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm">
                 <h3 className="font-bold text-lg mb-8">Revenue Overview</h3>
                 <div className="h-64 flex items-end gap-2 md:gap-8 pt-4">
                     {chartData.map((data, i) => {
@@ -146,7 +146,7 @@ export default function GuideEarningsPage() {
                             <div key={i} className="flex-1 flex flex-col items-center gap-3">
                                 <div className="w-full flex justify-center h-full relative group">
                                     <div 
-                                        className="w-full max-w-[48px] bg-teal-100 dark:bg-teal-900/40 rounded-t-xl group-hover:bg-teal-500 dark:group-hover:bg-teal-600 transition-colors absolute bottom-0"
+                                        className="w-full max-w-[48px] bg-teal-100 rounded-t-xl group-hover:bg-teal-500 dark:group-hover:bg-teal-600 transition-colors absolute bottom-0"
                                         style={{ height: heightPercentage }}
                                     ></div>
                                     <span className="absolute -top-8 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">

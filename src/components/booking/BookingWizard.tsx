@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { format } from "date-fns";
@@ -110,12 +110,12 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-slate-900/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-900 w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-bottom-8">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-bottom-8">
 
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <h2 className="text-xl font-bold text-slate-900">
                             {step === 4 ? "Booking Requested!" : `Book ${guide.name.split(' ')[0]}`}
                         </h2>
                         {step < 4 && (
@@ -136,7 +136,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                             <div className="h-16 w-16 bg-amber-100 rounded-full flex items-center justify-center mb-2">
                                 <ShieldAlert className="h-8 w-8 text-amber-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">NID Verification Required</h3>
+                            <h3 className="text-xl font-bold text-slate-900">NID Verification Required</h3>
                             <p className="text-slate-500 max-w-sm text-sm">
                                 To protect both travelers and guides, you need to verify your National ID before booking. This is a one-time process.
                             </p>
@@ -159,7 +159,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                                 <h3 className="text-lg font-semibold mb-1">When are you traveling?</h3>
                                 <p className="text-sm text-slate-500">Select your preferred dates.</p>
                             </div>
-                            <div className="border rounded-2xl p-4 flex justify-center bg-slate-50 dark:bg-slate-800/50">
+                            <div className="border rounded-2xl p-4 flex justify-center bg-slate-50">
                                 <Calendar
                                     mode="range"
                                     selected={{
@@ -195,7 +195,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                                         key={service.id}
                                         className={`flex items-start gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-colors ${selectedServices.includes(service.id)
                                             ? "border-primary bg-primary/5"
-                                            : "border-slate-100 dark:border-slate-800 hover:border-slate-200"
+                                            : "border-slate-100 hover:border-slate-200"
                                             }`}
                                     >
                                         <Checkbox
@@ -211,7 +211,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                                         />
                                         <div className="flex-1">
                                             <div className="flex justify-between">
-                                                <span className="font-semibold text-slate-900 dark:text-white">{service.title}</span>
+                                                <span className="font-semibold text-slate-900">{service.title}</span>
                                                 <span className="font-bold">৳{service.price}</span>
                                             </div>
                                             <p className="text-sm text-slate-500 mt-1">{service.description}</p>
@@ -292,10 +292,10 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                                     />
 
                                     {/* Submit Button inside form for Step 3 */}
-                                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center mt-6">
+                                    <div className="pt-4 border-t border-slate-100 flex justify-between items-center mt-6">
                                         <div>
                                             <p className="text-sm text-slate-500">Total amount (Est.)</p>
-                                            <p className="text-xl font-bold text-slate-900 dark:text-white">৳{calculateTotal()}</p>
+                                            <p className="text-xl font-bold text-slate-900">৳{calculateTotal()}</p>
                                         </div>
                                         <Button type="submit" size="lg" className="h-12 px-8 rounded-xl" disabled={isSubmitting}>
                                             {isSubmitting ? "Requesting..." : "Request Booking"}
@@ -311,7 +311,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
                             <div className="h-20 w-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
                                 <Check className="h-10 w-10 text-emerald-600" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Booking Requested!</h3>
+                            <h3 className="text-2xl font-bold text-slate-900">Booking Requested!</h3>
                             <p className="text-slate-500 max-w-sm">
                                 We have notified {guide.name.split(' ')[0]}. Our Ops team will create a WhatsApp group with you and the guide shortly to finalize the details and payment.
                             </p>
@@ -325,7 +325,7 @@ export function BookingWizard({ guide, onClose }: BookingWizardProps) {
 
                 {/* Footer Navigation (Steps 1 & 2) */}
                 {step < 3 && !isNidBlocked && (
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex justify-between items-center shrink-0">
+                    <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center shrink-0">
                         <Button
                             variant="outline"
                             onClick={() => setStep(step - 1)}

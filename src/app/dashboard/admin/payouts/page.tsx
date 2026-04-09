@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -70,7 +70,7 @@ export default function AdminPayoutsPage() {
         const guideEarning = order.guideEarning || (Number(order.totalPrice) - platformFee);
 
         return (
-            <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+            <Card className="p-6 rounded-3xl border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
                 <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
@@ -89,7 +89,7 @@ export default function AdminPayoutsPage() {
                         </Badge>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 py-4 border-y border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-xl px-4">
+                    <div className="grid grid-cols-3 gap-4 py-4 border-y border-slate-100 bg-slate-50/50 rounded-xl px-4">
                         <div>
                             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Total Paid by User</p>
                             <p className="text-base font-semibold">৳{order.totalPrice}</p>
@@ -105,7 +105,7 @@ export default function AdminPayoutsPage() {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-2 min-w-[160px] border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 justify-center">
+                <div className="flex flex-col gap-2 min-w-[160px] border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 justify-center">
                     {order.paymentStatus !== 'paid_out' ? (
                         <>
                             <div className="text-xs font-bold text-center text-amber-600 mb-2 truncate">Due: ৳{guideEarning}</div>
@@ -127,12 +127,12 @@ export default function AdminPayoutsPage() {
     return (
         <div className="max-w-6xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Payout Control</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Payout Control</h1>
                 <p className="text-slate-500">Track incoming platform revenue and dispatch guide payments.</p>
             </div>
 
             <Tabs defaultValue="pending" className="w-full">
-                <TabsList className="bg-slate-100/50 dark:bg-slate-800 p-1 rounded-2xl mb-6 flex space-x-2 w-fit">
+                <TabsList className="bg-slate-100/50 p-1 rounded-2xl mb-6 flex space-x-2 w-fit">
                     <TabsTrigger value="pending" className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-700">
                         Pending Payouts ({pendingPayouts.length})
                     </TabsTrigger>

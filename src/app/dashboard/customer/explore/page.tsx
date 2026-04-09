@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
@@ -16,7 +16,7 @@ const ExploreMap = dynamic(
     () => import("@/components/maps/ExploreMap"),
     { 
         ssr: false,
-        loading: () => <div className="h-[600px] w-full bg-slate-100 dark:bg-slate-800 animate-pulse rounded-[2rem] flex items-center justify-center font-bold text-slate-400">Loading Discovery Map...</div>
+        loading: () => <div className="h-[600px] w-full bg-slate-100 animate-pulse rounded-[2rem] flex items-center justify-center font-bold text-slate-400">Loading Discovery Map...</div>
     }
 );
 
@@ -125,20 +125,20 @@ export default function ExploreGuidesPage() {
         <div className="max-w-6xl space-y-6 pb-20">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white mb-2">Find Your Guide</h1>
+                    <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-2">Find Your Guide</h1>
                     <p className="text-slate-500 font-medium">Verified local experts across Bangladesh ready for your next adventure.</p>
                 </div>
                 
-                <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit shrink-0 shadow-inner">
+                <div className="flex p-1.5 bg-slate-100 rounded-2xl w-fit shrink-0 shadow-inner">
                     <button 
                         onClick={() => setViewMode("grid")}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${viewMode === "grid" ? "bg-white dark:bg-slate-900 shadow-xl text-teal-600" : "text-slate-500 hover:text-slate-700"}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${viewMode === "grid" ? "bg-white shadow-xl text-teal-600" : "text-slate-500 hover:text-slate-700"}`}
                     >
                         <LayoutGrid className="h-4 w-4" /> Grid
                     </button>
                     <button 
                         onClick={() => setViewMode("map")}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${viewMode === "map" ? "bg-white dark:bg-slate-900 shadow-xl text-teal-600" : "text-slate-500 hover:text-slate-700"}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${viewMode === "map" ? "bg-white shadow-xl text-teal-600" : "text-slate-500 hover:text-slate-700"}`}
                     >
                         <MapIcon className="h-4 w-4" /> Map
                     </button>
@@ -153,7 +153,7 @@ export default function ExploreGuidesPage() {
                         placeholder="Search guides by name, specialty, or area..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="pl-12 h-14 rounded-[1.25rem] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm text-lg focus:ring-teal-500"
+                        className="pl-12 h-14 rounded-[1.25rem] bg-white border-slate-200 shadow-sm text-lg focus:ring-teal-500"
                     />
                 </div>
                 <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className={`h-14 px-6 rounded-[1.25rem] flex items-center gap-2 font-bold transition-all ${showFilters ? 'bg-slate-900 text-white border-slate-900' : 'bg-white'}`}>
@@ -163,13 +163,13 @@ export default function ExploreGuidesPage() {
 
             {/* Collapsible Filters */}
             {showFilters && (
-                <Card className="p-8 rounded-[2rem] border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-8 shadow-xl bg-white dark:bg-slate-900/50 animate-in slide-in-from-top-4 duration-300">
+                <Card className="p-8 rounded-[2rem] border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-8 shadow-xl bg-white animate-in slide-in-from-top-4 duration-300">
                     <div className="space-y-3">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin className="h-3 w-3" /> Preferred Location</label>
                         <select
                             value={filterLocation}
                             onChange={e => setFilterLocation(e.target.value)}
-                            className="w-full h-12 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 text-sm font-medium focus:ring-2 ring-teal-500 transition-all outline-none"
+                            className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium focus:ring-2 ring-teal-500 transition-all outline-none"
                         >
                             <option value="">All Regions</option>
                             {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
@@ -182,7 +182,7 @@ export default function ExploreGuidesPage() {
                         </div>
                         <input type="range" min={settings.minCharge || 500} max={settings.maxCharge || 10000} step={100} value={filterMaxPrice}
                             onChange={e => setFilterMaxPrice(Number(e.target.value))}
-                            className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-teal-600" />
+                            className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600" />
                         <div className="flex justify-between text-[10px] font-bold text-slate-400">
                             <span>৳{settings.minCharge || 500}</span><span>৳{settings.maxCharge || 10000}</span>
                         </div>
@@ -192,7 +192,7 @@ export default function ExploreGuidesPage() {
                         <div className="flex gap-2">
                             {[0, 3, 4, 4.5].map(r => (
                                 <button key={r} onClick={() => setFilterMinRating(r)}
-                                    className={`flex-1 py-3 rounded-xl text-xs font-black border transition-all ${filterMinRating === r ? 'bg-teal-600 text-white border-teal-600 shadow-lg shadow-teal-600/20' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50'}`}>
+                                    className={`flex-1 py-3 rounded-xl text-xs font-black border transition-all ${filterMinRating === r ? 'bg-teal-600 text-white border-teal-600 shadow-lg shadow-teal-600/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
                                     {r === 0 ? 'Any' : `${r}+ ★`}
                                 </button>
                             ))}
@@ -204,7 +204,7 @@ export default function ExploreGuidesPage() {
             {/* Main Results Area */}
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {[...Array(6)].map((_, i) => <div key={i} className="h-80 rounded-[2.5rem] bg-slate-100 dark:bg-slate-800 animate-pulse" />)}
+                    {[...Array(6)].map((_, i) => <div key={i} className="h-80 rounded-[2.5rem] bg-slate-100 animate-pulse" />)}
                 </div>
             ) : (
                 <div className="space-y-12">
@@ -212,7 +212,7 @@ export default function ExploreGuidesPage() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 px-2">
                             <MapIcon className="h-5 w-5 text-teal-600" />
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Discovery Map</h2>
+                            <h2 className="text-xl font-bold text-slate-900">Discovery Map</h2>
                             <p className="text-[10px] font-bold text-slate-400 uppercase ml-auto">Search or browse to find local experts</p>
                         </div>
                         <ExploreMap guides={filtered} onBook={setSelectedGuide} />
@@ -223,7 +223,7 @@ export default function ExploreGuidesPage() {
                         <div className="flex items-center justify-between px-2">
                             <div className="flex items-center gap-2">
                                 <LayoutGrid className="h-5 w-5 text-teal-600" />
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Available Guides</h2>
+                                <h2 className="text-xl font-bold text-slate-900">Available Guides</h2>
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{filtered.length} Experts active</span>
@@ -231,19 +231,19 @@ export default function ExploreGuidesPage() {
                         </div>
 
                         {filtered.length === 0 ? (
-                            <Card className="p-20 text-center rounded-[3rem] border-dashed border-2 border-slate-200 dark:border-slate-800 bg-transparent">
-                                <div className="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                            <Card className="p-20 text-center rounded-[3rem] border-dashed border-2 border-slate-200 bg-transparent">
+                                <div className="h-20 w-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
                                     <Search className="h-8 w-8 text-slate-400" />
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No guides found</h3>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">No guides found</h3>
                                 <p className="text-slate-500 font-medium max-w-sm mx-auto">Try broadening your filters or searching for a different area in Bangladesh.</p>
                             </Card>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filtered.map(guide => (
-                                    <Card key={guide.id} className="rounded-[2.5rem] border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-slate-900">
+                                    <Card key={guide.id} className="rounded-[2.5rem] border-slate-200 shadow-sm overflow-hidden flex flex-col group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white">
                                         {/* Cover Photo */}
-                                        <div className="relative h-48 bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
+                                        <div className="relative h-48 bg-slate-100 overflow-hidden shrink-0">
                                             <img
                                                 src={guide.coverPhotoURL || `https://picsum.photos/seed/${guide.id}/600/350`}
                                                 alt={guide.name}
@@ -274,7 +274,7 @@ export default function ExploreGuidesPage() {
 
                                             {/* Avatar floating */}
                                             <div className="absolute -bottom-6 left-6">
-                                                <div className="h-16 w-16 rounded-2xl border-4 border-white dark:border-slate-900 bg-indigo-600 flex items-center justify-center shadow-xl overflow-hidden transform group-hover:scale-105 transition-transform">
+                                                <div className="h-16 w-16 rounded-2xl border-4 border-white bg-indigo-600 flex items-center justify-center shadow-xl overflow-hidden transform group-hover:scale-105 transition-transform">
                                                     {guide.avatarUrl ? (
                                                         <img src={guide.avatarUrl} alt={guide.name} className="h-full w-full object-cover" />
                                                     ) : (
@@ -287,24 +287,24 @@ export default function ExploreGuidesPage() {
                                         {/* Info */}
                                         <div className="p-6 pt-10 flex flex-col flex-1">
                                             <div className="mb-4">
-                                                <h3 className="text-lg font-black text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors">{guide.name}</h3>
+                                                <h3 className="text-lg font-black text-slate-900 group-hover:text-teal-600 transition-colors">{guide.name}</h3>
                                                 <p className="text-xs text-slate-500 font-medium line-clamp-1 mt-0.5">{guide.tagline || 'Experience the beauty of Bangladesh'}</p>
                                             </div>
 
                                             {guide.locations.length > 0 && (
                                                 <div className="flex flex-wrap gap-1.5 mb-6">
                                                     {guide.locations.slice(0, 3).map(loc => (
-                                                        <span key={loc} className="text-[9px] font-black uppercase tracking-wider bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-700">
+                                                        <span key={loc} className="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2 py-1 rounded-lg border border-slate-100">
                                                             {loc}
                                                         </span>
                                                     ))}
                                                 </div>
                                             )}
 
-                                            <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                                            <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-100">
                                                 <div>
                                                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Daily Rate</p>
-                                                    <p className="text-xl font-black text-slate-900 dark:text-white">
+                                                    <p className="text-xl font-black text-slate-900">
                                                         {guide.serviceCharge ? `৳${guide.serviceCharge.toLocaleString()}` : '—'}
                                                     </p>
                                                 </div>
@@ -312,7 +312,7 @@ export default function ExploreGuidesPage() {
                                                     <Button
                                                         variant="outline"
                                                         onClick={() => window.open(`/guides/${guide.id}`, '_blank')}
-                                                        className="rounded-2xl px-4 h-12 font-bold border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all"
+                                                        className="rounded-2xl px-4 h-12 font-bold border-slate-200 text-slate-600 hover:bg-slate-50 active:scale-95 transition-all"
                                                     >
                                                         Details
                                                     </Button>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrders } from "@/hooks/useOrders";
@@ -17,19 +17,19 @@ export default function CustomerMessagesPage() {
     return (
         <div className="max-w-3xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Messages</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Messages</h1>
                 <p className="text-slate-500">Chat with your guides via WhatsApp — all conversations organized by trip.</p>
             </div>
 
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-2xl p-4 text-sm flex gap-3">
+            <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl p-4 text-sm flex gap-3">
                 <MessageSquare className="h-5 w-5 shrink-0 mt-0.5" />
                 <p>Ghuri uses WhatsApp for all tour communications. Once your booking is confirmed, a Ghuri operations team member will add you to a WhatsApp group with your guide.</p>
             </div>
 
             {ordersLoading ? (
-                <div className="space-y-3">{[1,2].map(i => <div key={i} className="h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />)}</div>
+                <div className="space-y-3">{[1,2].map(i => <div key={i} className="h-20 rounded-2xl bg-slate-100 animate-pulse" />)}</div>
             ) : activeOrders.length === 0 ? (
-                <Card className="p-14 text-center rounded-3xl border-dashed border-slate-200 dark:border-slate-700">
+                <Card className="p-14 text-center rounded-3xl border-dashed border-slate-200">
                     <MessageSquare className="h-10 w-10 text-slate-300 mx-auto mb-3" />
                     <p className="text-slate-500 font-medium">No active conversations.</p>
                     <p className="text-sm text-slate-400">Book a trip to start chatting with a guide.</p>
@@ -37,13 +37,13 @@ export default function CustomerMessagesPage() {
             ) : (
                 <div className="space-y-3">
                     {activeOrders.map(order => (
-                        <Card key={order.id} className="p-5 rounded-2xl border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 hover:shadow-sm transition-shadow">
+                        <Card key={order.id} className="p-5 rounded-2xl border-slate-200 flex items-center justify-between gap-4 hover:shadow-sm transition-shadow">
                             <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                                <div className="h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0">
                                     <MessageSquare className="h-6 w-6 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-900 dark:text-white">Trip with {order.guideName || "your guide"}</p>
+                                    <p className="font-bold text-slate-900">Trip with {order.guideName || "your guide"}</p>
                                     <p className="text-sm text-slate-500">
                                         {order.destination || "Bangladesh"} · {order.startDate?.toDate ? order.startDate.toDate().toLocaleDateString() : 'TBD'}
                                     </p>

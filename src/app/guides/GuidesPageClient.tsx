@@ -33,29 +33,29 @@ export function GuidesPageClient() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 mt-8">
-                <Loader2 className="h-10 w-10 text-teal-500 animate-spin mb-4" />
-                <p className="text-slate-500 font-medium">Loading guides...</p>
+            <div className="flex flex-col items-center justify-center py-24">
+                <Loader2 className="h-8 w-8 text-[#067c18] animate-spin mb-3" />
+                <p className="text-gray-400 font-medium text-sm">Loading guides...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center shadow-sm border border-slate-100 dark:border-slate-700 mt-8">
-                <Compass className="h-12 w-12 text-red-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Something went wrong</h3>
-                <p className="text-slate-500">{error}</p>
+            <div className="bg-white rounded-3xl p-12 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-gray-100 mt-4">
+                <Compass className="h-12 w-12 text-red-200 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Something went wrong</h3>
+                <p className="text-gray-400">{error}</p>
             </div>
         );
     }
 
     if (guides.length === 0) {
         return (
-            <div className="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center shadow-sm border border-slate-100 dark:border-slate-700 mt-8">
-                <Compass className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No guides available</h3>
-                <p className="text-slate-500">We couldn&apos;t find any verified guides in the database right now.</p>
+            <div className="bg-white rounded-3xl p-12 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-gray-100 mt-4">
+                <Compass className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>No guides available</h3>
+                <p className="text-gray-400">We couldn&apos;t find any verified guides right now. Check back soon!</p>
             </div>
         );
     }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -54,7 +54,7 @@ export default function GuidePublicMap({ spots, interactive = false }: GuidePubl
             boxZoom={interactive}
             keyboard={interactive}
             style={{ height: "350px", width: "100%", borderRadius: "1.5rem" }}
-            className="z-0 border-2 border-slate-100 dark:border-slate-800 shadow-sm"
+            className="z-0 border-2 border-slate-100 shadow-sm"
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

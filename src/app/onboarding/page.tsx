@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
 
     if (loading || isSubmitting || dbUser?.role) {
         return (
-            <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <div className="flex h-screen items-center justify-center bg-slate-50">
                 <div className="animate-pulse flex flex-col items-center">
                     <div className="h-12 w-12 rounded-full border-4 border-teal-500 border-t-transparent animate-spin mb-4"></div>
                     <p className="text-slate-500">
@@ -223,34 +223,34 @@ export default function OnboardingPage() {
     // ─── STEP 1: Role Selection ─────────────────────────────────
     if (step === "role") {
         return (
-            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-20 px-4 bg-slate-50 dark:bg-slate-900">
+            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-20 px-4 bg-slate-50">
                 <div className="max-w-3xl w-full text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
-                        Welcome to <span className="text-teal-600 dark:text-teal-400">Ghuri</span>
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+                        Welcome to <span className="text-teal-600">Ghuri</span>
                     </h1>
-                    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+                    <p className="text-lg text-slate-600 max-w-xl mx-auto">
                         Before we continue, please tell us how you plan to use the platform so we can personalize your experience.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-                    <Card className="p-8 border-2 border-transparent hover:border-teal-500 transition-all cursor-pointer group bg-white dark:bg-slate-800 rounded-3xl" onClick={() => handleSelectRole("customer")}>
-                        <div className="h-20 w-20 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <Map className="h-10 w-10 text-teal-600 dark:text-teal-400" />
+                    <Card className="p-8 border-2 border-transparent hover:border-teal-500 transition-all cursor-pointer group bg-white rounded-3xl" onClick={() => handleSelectRole("customer")}>
+                        <div className="h-20 w-20 rounded-2xl bg-teal-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <Map className="h-10 w-10 text-teal-600" />
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">I want to Explore</h2>
-                        <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">I want to Explore</h2>
+                        <p className="text-slate-500 mb-8 leading-relaxed">
                             I&apos;m a traveler looking to find and book amazing Nogori Verified local guides for my next trip.
                         </p>
                         <Button className="w-full rounded-xl" size="lg">Continue as Traveler</Button>
                     </Card>
 
-                    <Card className="p-8 border-2 border-transparent hover:border-orange-500 transition-all cursor-pointer group bg-white dark:bg-slate-800 rounded-3xl" onClick={() => handleSelectRole("guide")}>
+                    <Card className="p-8 border-2 border-transparent hover:border-orange-500 transition-all cursor-pointer group bg-white rounded-3xl" onClick={() => handleSelectRole("guide")}>
                         <div className="h-20 w-20 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <Camera className="h-10 w-10 text-orange-600 dark:text-orange-400" />
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">I want to Guide</h2>
-                        <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">I want to Guide</h2>
+                        <p className="text-slate-500 mb-8 leading-relaxed">
                             I&apos;m a local expert, photographer, or planner looking to offer my travel services and earn money.
                         </p>
                         <Button className="w-full rounded-xl bg-orange-600 hover:bg-orange-700 text-white" size="lg">Apply as Guide</Button>
@@ -263,7 +263,7 @@ export default function OnboardingPage() {
     // ─── STEP 2: Guide Profile Info ─────────────────────────────
     if (step === "guide-profile") {
         return (
-            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
+            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50">
                 <div className="max-w-2xl w-full">
                     <div className="flex items-center gap-3 mb-8">
                         <button onClick={() => setStep("role")} className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -271,8 +271,8 @@ export default function OnboardingPage() {
                         </button>
                         <div className="flex-1 flex items-center gap-2">
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
-                            <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
-                            <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-slate-200 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-slate-200 rounded-full"></div>
                         </div>
                         <span className="text-sm text-slate-500 font-medium">Step 1 of 3</span>
                     </div>
@@ -281,11 +281,11 @@ export default function OnboardingPage() {
                         <div className="h-14 w-14 rounded-2xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center mx-auto mb-4">
                             <User className="h-7 w-7 text-orange-600" />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Set Up Your Profile</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Set Up Your Profile</h1>
                         <p className="text-slate-500">This information will be visible on your public guide page.</p>
                     </div>
 
-                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
+                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm bg-white">
                         <div className="flex flex-col gap-5">
                             <div className="grid gap-2">
                                 <Label className="text-slate-700 font-semibold">Display Name <span className="text-red-500">*</span></Label>
@@ -354,7 +354,7 @@ export default function OnboardingPage() {
     // ─── STEP 3: Student ID Verification ────────────────────────
     if (step === "guide-verification") {
         return (
-            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
+            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50">
                 <div className="max-w-2xl w-full">
                     <div className="flex items-center gap-3 mb-8">
                         <button onClick={() => setStep("guide-profile")} className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -363,46 +363,46 @@ export default function OnboardingPage() {
                         <div className="flex-1 flex items-center gap-2">
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
                             <div className="h-2 flex-1 bg-teal-500 rounded-full"></div>
-                            <div className="h-2 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                            <div className="h-2 flex-1 bg-slate-200 rounded-full"></div>
                         </div>
                         <span className="text-sm text-slate-500 font-medium">Step 2 of 3</span>
                     </div>
 
                     <div className="text-center mb-8">
-                        <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-4">
+                        <div className="h-14 w-14 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
                             <ShieldCheck className="h-7 w-7 text-emerald-600" />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Verify Your Identity</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Verify Your Identity</h1>
                         <p className="text-slate-500">You can upload your student ID now or do it later from your dashboard.</p>
                     </div>
 
                     {/* Student Email Auto-Detect Banner */}
                     {userIsStudent ? (
-                        <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-start gap-3">
+                        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
                             <GraduationCap className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
                             <div>
-                                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Student email detected — you&apos;ll be auto-verified!</p>
-                                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                <p className="text-sm font-semibold text-emerald-800">Student email detected — you&apos;ll be auto-verified!</p>
+                                <p className="text-xs text-emerald-600 mt-0.5">
                                     Your email ({user?.email}) is from a recognized institution. No ID upload needed.
                                 </p>
                             </div>
                         </div>
                     ) : (
-                        <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-3">
+                        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
                             <ShieldCheck className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                             <div>
-                                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Student ID required to receive bookings</p>
-                                <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                <p className="text-sm font-semibold text-amber-800">Student ID required to receive bookings</p>
+                                <p className="text-xs text-amber-700 mt-0.5">
                                     You can skip this for now and upload from your dashboard. You won&apos;t be able to accept bookings until verified.
                                 </p>
                             </div>
                         </div>
                     )}
 
-                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
+                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm bg-white">
                         <div className="flex flex-col gap-5">
                             <div className="grid gap-2">
-                                <Label className="text-slate-700 dark:text-slate-300 font-semibold">
+                                <Label className="text-slate-700 font-semibold">
                                     Student ID Card <span className="text-slate-400 font-normal text-xs">(optional — can upload later)</span>
                                 </Label>
                                 <p className="text-xs text-slate-500">
@@ -422,7 +422,7 @@ export default function OnboardingPage() {
                                         <img
                                             src={studentIdPreview}
                                             alt="Student ID preview"
-                                            className="w-full max-h-64 object-contain rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50"
+                                            className="w-full max-h-64 object-contain rounded-xl border border-slate-200 bg-slate-50"
                                         />
                                         <Button
                                             variant="outline"
@@ -431,7 +431,7 @@ export default function OnboardingPage() {
                                                 setStudentIdFile(null);
                                                 setStudentIdPreview(null);
                                             }}
-                                            className="absolute top-2 right-2 rounded-lg bg-white/90 dark:bg-slate-800/90 text-xs"
+                                            className="absolute top-2 right-2 rounded-lg bg-white/90 text-xs"
                                         >
                                             Remove
                                         </Button>
@@ -439,13 +439,13 @@ export default function OnboardingPage() {
                                 ) : (
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="mt-2 flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl hover:border-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors cursor-pointer"
+                                        className="mt-2 flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-slate-200 rounded-2xl hover:border-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors cursor-pointer"
                                     >
-                                        <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                        <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center">
                                             <Upload className="h-6 w-6 text-slate-400" />
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Click to upload your Student ID</p>
+                                            <p className="text-sm font-medium text-slate-700">Click to upload your Student ID</p>
                                             <p className="text-xs text-slate-400 mt-1">JPG, PNG up to 5MB</p>
                                         </div>
                                     </button>
@@ -453,7 +453,7 @@ export default function OnboardingPage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 pt-6 border-t border-slate-100">
                             <Button variant="ghost" onClick={handleVerificationNext} className="text-slate-500 font-medium rounded-xl">
                                 {studentIdFile ? "Skip upload, do it later" : "Skip for now"}
                             </Button>
@@ -475,7 +475,7 @@ export default function OnboardingPage() {
     // ─── STEP 4: First Service ──────────────────────────────────
     if (step === "guide-services") {
         return (
-            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50 dark:bg-slate-900">
+            <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center py-12 px-4 bg-slate-50">
                 <div className="max-w-2xl w-full">
                     <div className="flex items-center gap-3 mb-8">
                         <button onClick={() => setStep("guide-verification")} className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -493,11 +493,11 @@ export default function OnboardingPage() {
                         <div className="h-14 w-14 rounded-2xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center mx-auto mb-4">
                             <Sparkles className="h-7 w-7 text-orange-600" />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Add Your First Service</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Add Your First Service</h1>
                         <p className="text-slate-500">What&apos;s the main thing travelers can book you for? You can add more later.</p>
                     </div>
 
-                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
+                    <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm bg-white">
                         <div className="flex flex-col gap-5">
                             <div className="grid gap-2">
                                 <Label className="text-slate-700 font-semibold">Service Title</Label>
