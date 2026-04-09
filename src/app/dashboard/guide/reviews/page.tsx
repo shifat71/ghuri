@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -68,12 +68,12 @@ export default function GuideReviewsPage() {
     return (
         <div className="max-w-4xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Reviews & Ratings</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Reviews & Ratings</h1>
                 <p className="text-slate-500">See what travelers are saying about your tours.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
+                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
                     <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Average Rating</h3>
                     <div className="flex items-center gap-2 mb-2">
                         <Star className="h-10 w-10 text-amber-500 fill-amber-500" />
@@ -82,7 +82,7 @@ export default function GuideReviewsPage() {
                     <p className="text-slate-500 font-medium">Based on {reviews.length} reviews</p>
                 </Card>
 
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm md:col-span-2 flex flex-col justify-center">
+                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm md:col-span-2 flex flex-col justify-center">
                     <div className="space-y-3">
                         {[5, 4, 3, 2, 1].map(stars => {
                             const count = ratingCounts[stars - 1] || 0;
@@ -93,7 +93,7 @@ export default function GuideReviewsPage() {
                                         <span>{stars}</span>
                                         <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
                                     </div>
-                                    <div className="flex-1 h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
                                         <div 
                                             className="h-full bg-amber-500 rounded-full transition-all duration-1000"
                                             style={{ width: `${percentage}%` }}
@@ -107,7 +107,7 @@ export default function GuideReviewsPage() {
                 </Card>
             </div>
 
-            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                     <h3 className="font-bold text-xl flex items-center gap-2">
                         <MessageSquare className="h-5 w-5 text-teal-600" />
@@ -116,16 +116,16 @@ export default function GuideReviewsPage() {
                 </div>
 
                 {reviews.length === 0 ? (
-                    <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                         <p className="text-slate-500">No reviews yet. Complete some tours to build your reputation!</p>
                     </div>
                 ) : (
                     <div className="space-y-6">
                         {reviews.map((review) => (
-                            <div key={review.id} className="p-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div key={review.id} className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                                 <div className="flex items-start justify-between gap-4 mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-600">
+                                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-slate-200">
                                             <User className="h-5 w-5 text-slate-400" />
                                         </div>
                                         <div>
@@ -137,11 +137,11 @@ export default function GuideReviewsPage() {
                                     </div>
                                     <div className="flex text-amber-500">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-amber-500' : 'text-slate-300 dark:text-slate-600'}`} />
+                                            <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-amber-500' : 'text-slate-300'}`} />
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-slate-700 dark:text-slate-300 italic">"{review.comment}"</p>
+                                <p className="text-slate-700 italic">"{review.comment}"</p>
                             </div>
                         ))}
                     </div>

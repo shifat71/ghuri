@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -69,7 +69,7 @@ export default function AdminGuidesPage() {
         <div className="max-w-6xl space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Guide Management</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Guide Management</h1>
                     <p className="text-slate-500">Review applications, verify identities, and manage active guides.</p>
                 </div>
             </div>
@@ -81,15 +81,15 @@ export default function AdminGuidesPage() {
                         placeholder="Search by name or email..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 h-12 bg-white dark:bg-slate-900 rounded-xl border-slate-200 shadow-sm"
+                        className="pl-10 h-12 bg-white rounded-xl border-slate-200 shadow-sm"
                     />
                 </div>
             </div>
 
-            <Card className="rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden bg-white dark:bg-slate-900/50">
+            <Card className="rounded-3xl border-slate-200 shadow-sm overflow-hidden bg-white">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-500 uppercase tracking-wider bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800">
+                        <thead className="text-xs text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
                             <tr>
                                 <th className="px-6 py-4 font-bold">Guide Profile</th>
                                 <th className="px-6 py-4 font-bold">Status</th>
@@ -106,7 +106,7 @@ export default function AdminGuidesPage() {
                                     </td>
                                 </tr>
                             ) : filteredGuides.map((guide) => (
-                                <tr key={guide.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <tr key={guide.id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 shrink-0 overflow-hidden">
@@ -119,7 +119,7 @@ export default function AdminGuidesPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                <div className="font-bold text-slate-900 flex items-center gap-2">
                                                     {guide.name || "Unknown Guide"}
                                                     {(guide.nogoriStatus === 'verified' || guide.nogoriStatus === 'pro') && (
                                                         <ShieldCheck className="h-4 w-4 text-emerald-500" />

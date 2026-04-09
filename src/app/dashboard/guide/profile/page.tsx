@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -172,7 +172,7 @@ export default function GuideProfileSettings() {
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Profile Settings</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Profile Settings</h1>
                     <p className="text-slate-500">Edit the public information travelers see on your guide page.</p>
                 </div>
             </div>
@@ -186,7 +186,7 @@ export default function GuideProfileSettings() {
             <form onSubmit={handleSave} className="flex flex-col gap-8">
 
                 {/* Visuals Card */}
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm">
                     <h2 className="text-xl font-bold mb-6">Profile Images</h2>
 
                     <div className="grid gap-6 md:grid-cols-2">
@@ -243,7 +243,7 @@ export default function GuideProfileSettings() {
                 </Card>
 
                 {/* Info Card */}
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm">
                     <h2 className="text-xl font-bold mb-6">Basic Information</h2>
 
                     <div className="flex flex-col gap-6">
@@ -318,7 +318,7 @@ export default function GuideProfileSettings() {
                 </Card>
 
                 {/* Services Card */}
-                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-xl font-bold">Services & Pricing</h2>
@@ -331,13 +331,13 @@ export default function GuideProfileSettings() {
                     </div>
 
                     {formData.services.length === 0 ? (
-                        <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200">
+                        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                             <p className="text-slate-500">You haven't added any services yet.</p>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-6">
                             {formData.services.map((service, index) => (
-                                <div key={service.id} className="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 relative group">
+                                <div key={service.id} className="p-5 rounded-2xl border border-slate-200 bg-slate-50 relative group">
                                     <Button
                                         type="button"
                                         variant="ghost"
@@ -354,7 +354,7 @@ export default function GuideProfileSettings() {
                                             <Input
                                                 value={service.title}
                                                 onChange={(e) => updateService(index, 'title', e.target.value)}
-                                                className="bg-white dark:bg-slate-900 border-none rounded-xl"
+                                                className="bg-white border-none rounded-xl"
                                                 placeholder="e.g. Full Day Tour"
                                                 required
                                             />
@@ -364,7 +364,7 @@ export default function GuideProfileSettings() {
                                             <select
                                                 value={service.category}
                                                 onChange={(e) => updateService(index, 'category', e.target.value)}
-                                                className="flex h-10 w-full rounded-xl border-none bg-white dark:bg-slate-900 px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                                                className="flex h-10 w-full rounded-xl border-none bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                                             >
                                                 <option value="guided_tour">Guided Tour</option>
                                                 <option value="photography">Photography</option>
@@ -378,7 +378,7 @@ export default function GuideProfileSettings() {
                                                 type="number"
                                                 value={service.price}
                                                 onChange={(e) => updateService(index, 'price', Number(e.target.value))}
-                                                className="bg-white dark:bg-slate-900 border-none rounded-xl"
+                                                className="bg-white border-none rounded-xl"
                                                 required
                                             />
                                         </div>
@@ -387,7 +387,7 @@ export default function GuideProfileSettings() {
                                             <select
                                                 value={service.priceType}
                                                 onChange={(e) => updateService(index, 'priceType', e.target.value)}
-                                                className="flex h-10 w-full rounded-xl border-none bg-white dark:bg-slate-900 px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                                                className="flex h-10 w-full rounded-xl border-none bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
                                             >
                                                 <option value="per_day">Per Day</option>
                                                 <option value="per_person">Per Person</option>
@@ -399,7 +399,7 @@ export default function GuideProfileSettings() {
                                             <Textarea
                                                 value={service.description}
                                                 onChange={(e) => updateService(index, 'description', e.target.value)}
-                                                className="bg-white dark:bg-slate-900 border-none rounded-xl resize-none h-20"
+                                                className="bg-white border-none rounded-xl resize-none h-20"
                                                 placeholder="What's included in this service?"
                                                 required
                                             />
@@ -412,7 +412,7 @@ export default function GuideProfileSettings() {
                 </Card>
 
                 {/* Actions */}
-                <div className="flex justify-end gap-3 sticky bottom-4 z-10 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg">
+                <div className="flex justify-end gap-3 sticky bottom-4 z-10 p-4 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200 shadow-lg">
                     <Link href="/dashboard/guide">
                         <Button type="button" variant="outline" className="h-12 px-6 rounded-xl">
                             Cancel

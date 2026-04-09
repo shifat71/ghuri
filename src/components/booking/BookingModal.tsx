@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -69,9 +69,9 @@ export default function BookingModal({ guide, onClose }: BookingModalProps) {
 
     return (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between p-6 border-b border-slate-100">
                     <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-2xl overflow-hidden bg-teal-100 flex items-center justify-center shrink-0">
                             {guide.avatarUrl
@@ -81,7 +81,7 @@ export default function BookingModal({ guide, onClose }: BookingModalProps) {
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="font-black text-slate-900 dark:text-white">{guide.name}</h2>
+                                <h2 className="font-black text-slate-900">{guide.name}</h2>
                                 {(guide.nogoriStatus === 'verified' || guide.nogoriStatus === 'pro') && (
                                     <BadgeCheck className="h-4 w-4 text-teal-600" />
                                 )}
@@ -111,7 +111,7 @@ export default function BookingModal({ guide, onClose }: BookingModalProps) {
                             {availLoading ? (
                                 <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-teal-600" /></div>
                             ) : (
-                                <div className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden p-1">
+                                <div className="border border-slate-100 rounded-2xl overflow-hidden p-1">
                                     <DayPicker
                                         mode="single"
                                         selected={selectedDate}
@@ -138,24 +138,24 @@ export default function BookingModal({ guide, onClose }: BookingModalProps) {
                                         <label className="text-xs font-bold text-slate-500 mb-1 block">Group Size</label>
                                         <input type="number" min={1} max={20} value={groupSize}
                                             onChange={e => setGroupSize(Number(e.target.value))}
-                                            className="w-full h-10 px-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950 text-sm font-bold" />
+                                            className="w-full h-10 px-3 border border-slate-200 rounded-xl bg-white text-sm font-bold" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-slate-500 mb-1 block">Special Requests</label>
                                         <textarea rows={3} value={specialRequests}
                                             onChange={e => setSpecialRequests(e.target.value)}
                                             placeholder="Any preferences, dietary needs, accessibility requirements..."
-                                            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950 text-sm resize-none" />
+                                            className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm resize-none" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Price Breakdown */}
-                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 space-y-2">
+                            <div className="bg-slate-50 rounded-2xl p-4 space-y-2">
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Price Breakdown</p>
                                 <div className="flex justify-between text-sm"><span className="text-slate-500">Guide rate / day</span><span className="font-bold">৳{price.toLocaleString()}</span></div>
                                 <div className="flex justify-between text-sm"><span className="text-slate-500">Platform fee</span><span className="font-bold text-slate-400">৳{platformFee.toLocaleString()}</span></div>
-                                <div className="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-2 mt-1">
+                                <div className="flex justify-between border-t border-slate-200 pt-2 mt-1">
                                     <span className="font-bold">Total</span>
                                     <span className="text-teal-600 font-black text-lg">৳{price.toLocaleString()}</span>
                                 </div>

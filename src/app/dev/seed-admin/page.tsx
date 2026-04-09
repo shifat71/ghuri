@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -70,8 +70,8 @@ export default function SeedAdminPage() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-slate-50 dark:bg-slate-950">
-            <div className="max-w-md w-full p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 text-center space-y-6">
+        <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-slate-50">
+            <div className="max-w-md w-full p-8 bg-white rounded-3xl shadow-xl border border-slate-200 text-center space-y-6">
                 <h1 className="text-2xl font-bold">Role Seeder (Dev Only)</h1>
                 
                 {!user ? (
@@ -80,7 +80,7 @@ export default function SeedAdminPage() {
                     </p>
                 ) : (
                     <div className="space-y-4">
-                        <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm">
+                        <div className="p-4 bg-slate-100 rounded-xl text-sm">
                             <p><strong>Current User:</strong> {user.email}</p>
                             <p><strong>Current Role:</strong> {dbUser?.role || 'Unknown'}</p>
                         </div>
@@ -123,7 +123,7 @@ export default function SeedAdminPage() {
                                     setLoading(false);
                                 }}
                                 disabled={loading}
-                                className="w-full py-3 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                                className="w-full py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
                             >
                                 {loading ? "..." : "Fix Existing Guides (Visibility)"}
                             </button>
@@ -141,7 +141,7 @@ export default function SeedAdminPage() {
                                     setLoading(false);
                                 }}
                                 disabled={loading}
-                                className="w-full py-3 border-2 border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl hover:bg-amber-50 transition-colors disabled:opacity-50"
+                                className="w-full py-3 border-2 border-amber-200 text-amber-600 font-bold rounded-xl hover:bg-amber-50 transition-colors disabled:opacity-50"
                             >
                                 {loading ? "..." : "Seed Accepted Edu Domains"}
                             </button>

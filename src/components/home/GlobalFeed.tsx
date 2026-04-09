@@ -5,6 +5,7 @@ import { collection, query, limit, getDocs, orderBy, doc, getDoc } from "firebas
 import { db } from "@/lib/firebase/config";
 import { Globe, Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 interface GlobalPost {
     id: string;
@@ -12,7 +13,7 @@ interface GlobalPost {
     content: string;
     imageUrl?: string;
     videoUrl?: string;
-    createdAt: any;
+    createdAt: unknown;
     likes: number;
     guideName?: string;
     guideAvatar?: string;
@@ -58,10 +59,10 @@ export function GlobalFeed() {
         fetchFeed();
     }, []);
 
-    const formatTimestamp = (timestamp: any) => {
+    const formatTimestamp = (timestamp: unknown) => {
         if (!timestamp) return "Just now";
         try {
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const date = (timestamp as { toDate?: () => Date }).toDate ? (timestamp as { toDate: () => Date }).toDate() : new Date(timestamp as string | number);
             const now = new Date();
             const diffMs = now.getTime() - date.getTime();
             const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -76,14 +77,14 @@ export function GlobalFeed() {
 
     if (loading) {
         return (
-            <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+            <div className="flex flex-col gap-8 w-full">
                 {[1, 2].map(i => (
-                    <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                        <div className="p-4 flex gap-3 h-20 items-center">
-                             <div className="h-10 w-10 bg-slate-200 rounded-full" />
-                             <div className="space-y-2"><div className="h-3 w-24 bg-slate-200 rounded" /><div className="h-2 w-12 bg-slate-200 rounded" /></div>
+                    <div key={i} className="animate-pulse bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                        <div className="p-6 flex gap-4 h-24 items-center">
+                             <div className="h-12 w-12 bg-gray-200 rounded-full" />
+                             <div className="space-y-3"><div className="h-3 w-32 bg-gray-200 rounded" /><div className="h-2 w-16 bg-gray-100 rounded" /></div>
                         </div>
-                        <div className="h-[400px] w-full bg-slate-100" />
+                        <div className="h-[400px] w-full bg-gray-50" />
                     </div>
                 ))}
             </div>
@@ -93,25 +94,34 @@ export function GlobalFeed() {
     if (posts.length === 0) return null;
 
     return (
-        <div className="flex flex-col gap-8 max-w-2xl mx-auto">
-            {posts.map((post) => (
-                <div key={post.id} className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex flex-col gap-10 w-full">
+            {posts.map((post, idx) => (
+                <motion.div 
+                    key={post.id} 
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgb(0,0,0,0.08)] transition-all duration-500 flex flex-col"
+                >
                     
                     {/* Header */}
-                    <div className="flex items-center justify-between px-5 pt-4 pb-3">
-                        <Link href={`/guides/${post.guideId}`} className="flex items-center gap-3 group">
-                            <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 ring-2 ring-transparent group-hover:ring-teal-500 transition-all">
+                    <div className="flex items-center justify-between px-6 pt-6 pb-4">
+                        <Link href={`/guides/${post.guideId}`} className="flex items-center gap-4 group">
+                            <div className="h-12 w-12 rounded-full overflow-hidden shrink-0 border border-gray-100 group-hover:border-[#067c18]/30 transition-all shadow-sm">
                                 {post.guideAvatar ? (
                                     <img src={post.guideAvatar} alt={post.guideName} className="h-full w-full object-cover" />
                                 ) : (
-                                    <div className="h-full w-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 font-bold">
+                                    <div className="h-full w-full bg-[#067c18]/10 flex items-center justify-center text-[#067c18] font-bold text-lg">
                                         {post.guideName?.charAt(0)}
                                     </div>
                                 )}
                             </div>
                             <div>
-                                <p className="font-bold text-slate-900 dark:text-white leading-tight group-hover:text-teal-600 transition-colors">{post.guideName}</p>
-                                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                                <p className="font-bold text-gray-900 text-base leading-tight group-hover:text-[#067c18] transition-colors" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+                                    {post.guideName}
+                                </p>
+                                <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 mt-1">
                                     <span>{formatTimestamp(post.createdAt)}</span>
                                     <span>·</span>
                                     <Globe className="h-3 w-3" />
@@ -122,41 +132,52 @@ export function GlobalFeed() {
 
                     {/* Content */}
                     {post.content && (
-                        <div className="px-5 pb-3">
-                            <p className="text-slate-900 dark:text-slate-100 whitespace-pre-wrap break-words">{post.content}</p>
+                        <div className="px-6 pb-5">
+                            <p className="text-gray-600 whitespace-pre-wrap break-words text-[0.9375rem] leading-relaxed">
+                                {post.content}
+                            </p>
                         </div>
                     )}
 
-                    {/* Media */}
-                    {post.imageUrl && (
-                        <div className="w-full bg-slate-50 dark:bg-slate-900">
-                            <img src={post.imageUrl} alt="Post" className="w-full max-h-[600px] object-cover" loading="lazy" />
-                        </div>
-                    )}
-                    {post.videoUrl && (
-                        <div className="w-full bg-black">
-                            <video src={post.videoUrl} controls playsInline className="w-full max-h-[600px] object-contain" />
-                        </div>
-                    )}
+                    {/* Media Container (Main Content Area) */}
+                    <div className="w-full relative">
+                        {post.imageUrl && (
+                            <img 
+                                src={post.imageUrl} 
+                                alt="Post" 
+                                className="w-full h-auto max-h-[700px] object-cover transition-transform duration-700 hover:scale-[1.02]" 
+                                loading="lazy" 
+                            />
+                        )}
+                        {post.videoUrl && (
+                            <video 
+                                src={post.videoUrl} 
+                                controls 
+                                playsInline 
+                                className="w-full h-auto max-h-[700px] bg-black object-contain" 
+                            />
+                        )}
+                    </div>
 
-                    {/* Actions */}
-                    <div className="px-5 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <button className="text-slate-900 dark:text-white hover:text-red-500 transition-colors">
-                                <Heart className="h-6 w-6" />
+                    {/* Actions Bar */}
+                    <div className="px-6 py-4 flex items-center justify-between border-t border-gray-50 bg-[#fafafa]/50">
+                        <div className="flex items-center gap-2">
+                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-500 transition-colors group">
+                                <Heart className="h-5 w-5 group-hover:fill-red-500 transition-all duration-300" />
+                                {post.likes > 0 && <span className="font-bold text-sm">{post.likes}</span>}
                             </button>
-                            <button className="text-slate-900 dark:text-white hover:text-slate-500 transition-colors">
-                                <MessageCircle className="h-6 w-6" />
+                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+                                <MessageCircle className="h-5 w-5" />
                             </button>
-                            <button className="text-slate-900 dark:text-white hover:text-slate-500 transition-colors">
-                                <Share2 className="h-6 w-6" />
+                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+                                <Share2 className="h-5 w-5" />
                             </button>
                         </div>
-                        <button className="text-slate-900 dark:text-white hover:text-slate-500 transition-colors">
-                            <Bookmark className="h-6 w-6" />
+                        <button className="px-3 py-1.5 rounded-full hover:bg-[#067c18]/10 text-gray-400 hover:text-[#067c18] transition-colors">
+                            <Bookmark className="h-5 w-5" />
                         </button>
                     </div>
-                </div>
+                </motion.div>
             ))}
         </div>
     );

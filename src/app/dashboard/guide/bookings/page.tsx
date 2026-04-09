@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -58,7 +58,7 @@ export default function GuideBookingsPage() {
     const past = bookings.filter(b => b.status === "completed" || b.status === "rejected");
 
     const BookingCard = ({ booking }: { booking: any }) => (
-        <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+        <Card className="p-6 rounded-3xl border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
             <div className="flex-1 space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -84,7 +84,7 @@ export default function GuideBookingsPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-slate-100">
                     <div className="space-y-1">
                         <p className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> Date</p>
                         <p className="text-sm font-semibold">{booking.startDate?.toDate ? booking.startDate.toDate().toLocaleDateString() : 'TBD'}</p>
@@ -110,7 +110,7 @@ export default function GuideBookingsPage() {
                 )}
             </div>
 
-            <div className="flex flex-col gap-3 min-w-[160px] border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 justify-center">
+            <div className="flex flex-col gap-3 min-w-[160px] border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 justify-center">
                 {booking.status === 'pending' ? (
                     <>
                         <Button onClick={() => handleAction(booking.id, 'confirmed')} className="w-full bg-emerald-600 hover:bg-emerald-700 h-10 rounded-xl">
@@ -136,12 +136,12 @@ export default function GuideBookingsPage() {
     return (
         <div className="max-w-5xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Bookings</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Bookings</h1>
                 <p className="text-slate-500">Manage your tour requests, communicate with travelers, and view your schedule.</p>
             </div>
 
             <Tabs defaultValue="pending" className="w-full">
-                <TabsList className="bg-slate-100/50 dark:bg-slate-800 p-1 rounded-2xl mb-6 flex space-x-2 w-fit">
+                <TabsList className="bg-slate-100/50 p-1 rounded-2xl mb-6 flex space-x-2 w-fit">
                     <TabsTrigger value="pending" className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                         Pending ({pending.length})
                     </TabsTrigger>
@@ -155,7 +155,7 @@ export default function GuideBookingsPage() {
 
                 <TabsContent value="pending" className="space-y-4">
                     {pending.length > 0 ? pending.map(b => <BookingCard key={b.id} booking={b} />) : (
-                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50">
                             <p className="text-slate-500">No pending booking requests right now.</p>
                         </Card>
                     )}
@@ -163,7 +163,7 @@ export default function GuideBookingsPage() {
 
                 <TabsContent value="upcoming" className="space-y-4">
                     {upcoming.length > 0 ? upcoming.map(b => <BookingCard key={b.id} booking={b} />) : (
-                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50">
                             <p className="text-slate-500">You have no upcoming tours.</p>
                         </Card>
                     )}
@@ -171,7 +171,7 @@ export default function GuideBookingsPage() {
 
                 <TabsContent value="past" className="space-y-4">
                     {past.length > 0 ? past.map(b => <BookingCard key={b.id} booking={b} />) : (
-                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        <Card className="p-12 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50">
                             <p className="text-slate-500">No past bookings found.</p>
                         </Card>
                     )}

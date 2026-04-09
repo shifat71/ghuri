@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,19 +44,19 @@ export default function GuideServicesPage() {
     return (
         <div className="max-w-2xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Service Charge</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Service Charge</h1>
                 <p className="text-slate-500">Set your daily rate. Admin controls the allowed range — this updates live.</p>
             </div>
 
             {/* Live sync notice */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 rounded-2xl text-sm">
+            <div className="flex items-center gap-3 px-4 py-3 bg-teal-50 border border-teal-200 rounded-2xl text-sm">
                 <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse shrink-0" />
-                <span className="text-teal-700 dark:text-teal-400 font-medium">
+                <span className="text-teal-700 font-medium">
                     Allowed range is live-synced from Admin: <strong>৳{settings.minCharge} – ৳{settings.maxCharge}</strong>
                 </span>
             </div>
 
-            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm space-y-8">
+            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm space-y-8">
                 {/* Slider */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -90,7 +90,7 @@ export default function GuideServicesPage() {
                 </div>
 
                 {/* Breakdown */}
-                <div className="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-2xl">
+                <div className="space-y-3 bg-slate-50 p-5 rounded-2xl">
                     <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Earnings Breakdown</h3>
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-500 font-medium">Traveler pays</span>
@@ -100,8 +100,8 @@ export default function GuideServicesPage() {
                         <span className="text-slate-500 font-medium">Platform fee ({settings.commissionPercent}%)</span>
                         <span className="font-bold text-red-500">−৳{platformFee.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-sm border-t border-slate-200 dark:border-slate-700 pt-3 mt-1">
-                        <span className="font-bold text-slate-700 dark:text-slate-200">You earn</span>
+                    <div className="flex justify-between text-sm border-t border-slate-200 pt-3 mt-1">
+                        <span className="font-bold text-slate-700">You earn</span>
                         <span className="font-black text-teal-600 text-lg">৳{guideEarning.toLocaleString()}</span>
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export default function GuideServicesPage() {
                             {competitiveness}%
                         </span>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div
                             className={`h-full rounded-full transition-all duration-500 ${competitiveness > 60 ? 'bg-emerald-500' : competitiveness > 30 ? 'bg-amber-500' : 'bg-red-500'}`}
                             style={{ width: `${competitiveness}%` }}

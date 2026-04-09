@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -62,7 +62,7 @@ export default function AdminBookingsPage() {
         <div className="max-w-6xl space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Booking Oversight</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Booking Oversight</h1>
                     <p className="text-slate-500">Monitor all platform transactions and resolve disputes.</p>
                 </div>
             </div>
@@ -74,7 +74,7 @@ export default function AdminBookingsPage() {
                         placeholder="Search by ID, User, or Guide..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 h-12 bg-white dark:bg-slate-900 rounded-xl border-slate-200 shadow-sm"
+                        className="pl-10 h-12 bg-white rounded-xl border-slate-200 shadow-sm"
                     />
                 </div>
             </div>
@@ -85,7 +85,7 @@ export default function AdminBookingsPage() {
                         <p className="text-slate-500">No bookings match your search.</p>
                     </Card>
                 ) : filteredBookings.map((booking) => (
-                    <Card key={booking.id} className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+                    <Card key={booking.id} className="p-6 rounded-3xl border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
                         <div className="flex-1 space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -110,7 +110,7 @@ export default function AdminBookingsPage() {
                                 </Badge>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-4 py-3 border-y border-slate-100 dark:border-slate-800">
+                            <div className="grid grid-cols-3 gap-4 py-3 border-y border-slate-100">
                                 <div>
                                     <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Total Value</p>
                                     <p className="text-sm font-semibold">৳{booking.totalPrice}</p>
@@ -128,7 +128,7 @@ export default function AdminBookingsPage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 min-w-[150px] border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 md:pl-6 justify-center">
+                        <div className="flex flex-col gap-2 min-w-[150px] border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 justify-center">
                             {(booking.status === 'pending' || booking.status === 'confirmed') && (
                                 <Button 
                                     onClick={() => handleForceCancel(booking.id)} 

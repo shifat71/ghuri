@@ -47,59 +47,77 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* ── Carbon Light Theme (DESIGN.md) ─────────────────────── */
 :root {
-  --background: #fdfdfc;
-  --foreground: #0f172a;
+  --background: #fafafa;
+  --foreground: #111827;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #111827;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #0f766e;
+  --popover-foreground: #111827;
+  --primary: #067c18;
   --primary-foreground: #ffffff;
-  --secondary: #ea580c;
+  --secondary: #8e63f0;
   --secondary-foreground: #ffffff;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
+  --muted: #eeeeee;
+  --muted-foreground: #6b7280;
+  --accent: #f0fdf4;
+  --accent-foreground: #067c18;
   --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #0f766e;
-  --chart-1: #0f766e;
-  --chart-2: #14b8a6;
-  --chart-3: #ea580c;
-  --chart-4: #f97316;
-  --chart-5: #10b981;
-  --radius: 0.75rem;
+  --destructive-foreground: #ffffff;
+  --border: #e0e0e0;
+  --input: #eeeeee;
+  --ring: #067c18;
+  --chart-1: #067c18;
+  --chart-2: #05802a;
+  --chart-3: #8e63f0;
+  --chart-4: #10b981;
+  --chart-5: #6d28d9;
+  --radius: 1.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #067c18;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0fdf4;
+  --sidebar-accent-foreground: #067c18;
+  --sidebar-border: #e0e0e0;
+  --sidebar-ring: #067c18;
 }
 
+/* Carbon is light-only — override dark to same values */
 .dark {
-  --background: #0b1120;
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-  --primary: #14b8a6;
-  --primary-foreground: #0b1120;
-  --secondary: #fb923c;
-  --secondary-foreground: #0b1120;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #f8fafc;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #14b8a6;
-  --chart-1: #14b8a6;
-  --chart-2: #0f766e;
-  --chart-3: #fb923c;
-  --chart-4: #ea580c;
-  --chart-5: #10b981;
+  --background: #fafafa;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #067c18;
+  --primary-foreground: #ffffff;
+  --secondary: #8e63f0;
+  --secondary-foreground: #ffffff;
+  --muted: #eeeeee;
+  --muted-foreground: #6b7280;
+  --accent: #f0fdf4;
+  --accent-foreground: #067c18;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e0e0e0;
+  --input: #eeeeee;
+  --ring: #067c18;
+  --chart-1: #067c18;
+  --chart-2: #05802a;
+  --chart-3: #8e63f0;
+  --chart-4: #10b981;
+  --chart-5: #6d28d9;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #067c18;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0fdf4;
+  --sidebar-accent-foreground: #067c18;
+  --sidebar-border: #e0e0e0;
+  --sidebar-ring: #067c18;
 }
 
 @layer base {
@@ -109,12 +127,40 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Public Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 }
 
+/* ── Elevation (DESIGN.md minimal shadows) ─────────────── */
+.elevation-1 { box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.elevation-2 { box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
+
+/* ── Hero Background ──────────────────────────────────── */
+.hero-radial {
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(6,124,24,0.07) 0%, transparent 70%);
+}
+
+/* ── Glass Nav ────────────────────────────────────────── */
+.glass-nav {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(6,124,24,0.14);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+/* ── No-scrollbar ─────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Carousel image transitions ───────────────────────── */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes fadeOut {
@@ -122,10 +168,5 @@
   to   { opacity: 0; }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 1.2s ease-in-out forwards;
-}
-
-.animate-fadeOut {
-  animation: fadeOut 1.2s ease-in-out forwards;
-}
+.animate-fadeIn  { animation: fadeIn  1.4s ease-in-out forwards; }
+.animate-fadeOut { animation: fadeOut 0.8s ease-in-out forwards; }

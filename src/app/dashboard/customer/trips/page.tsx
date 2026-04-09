@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrders } from "@/hooks/useOrders";
@@ -11,7 +11,7 @@ import { CustomerTripCard } from "@/components/dashboard/CustomerTripCard";
 
 function EmptyState({ label }: { label: string }) {
     return (
-        <Card className="p-14 text-center rounded-3xl border-dashed border-slate-200 dark:border-slate-700">
+        <Card className="p-14 text-center rounded-3xl border-dashed border-slate-200">
             <AlertCircle className="h-10 w-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No {label} trips.</p>
         </Card>
@@ -47,15 +47,15 @@ export default function CustomerTripsPage() {
     return (
         <div className="max-w-4xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">My Trips</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">My Trips</h1>
                 <p className="text-slate-500">Manage all your upcoming and past adventures.</p>
             </div>
 
             {ordersLoading ? (
-                <div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-32 rounded-3xl bg-slate-100 dark:bg-slate-800 animate-pulse" />)}</div>
+                <div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="h-32 rounded-3xl bg-slate-100 animate-pulse" />)}</div>
             ) : (
                 <Tabs defaultValue="upcoming" className="w-full">
-                    <TabsList className="bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-2xl flex flex-wrap gap-1 h-auto w-fit mb-6">
+                    <TabsList className="bg-slate-100/80 p-1 rounded-2xl flex flex-wrap gap-1 h-auto w-fit mb-6">
                         <TabsTrigger value="upcoming" className="rounded-xl px-4 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                             Upcoming {upcoming.length > 0 && <span className="ml-2 bg-teal-100 text-teal-700 text-xs font-bold px-1.5 py-0.5 rounded-md">{upcoming.length}</span>}
                         </TabsTrigger>

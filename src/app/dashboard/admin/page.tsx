@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -172,17 +172,17 @@ export default function AdminDashboard() {
         <div className="container mx-auto px-4 py-8 max-w-5xl">
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center">
                         <ShieldCheck className="h-5 w-5 text-teal-600" />
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Admin Panel</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Admin Panel</h1>
                 </div>
                 <p className="text-slate-500 ml-13">Review verifications and manage platform settings.</p>
             </div>
 
             <Tabs defaultValue="guides" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl">
-                    <TabsTrigger value="guides" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                <TabsList className="grid w-full grid-cols-3 mb-6 h-12 bg-slate-100 rounded-xl">
+                    <TabsTrigger value="guides" className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2">
                         <GraduationCap className="h-4 w-4" />
                         <span className="hidden sm:inline">Guide</span> Verifications
                         {pendingGuides.length > 0 && (
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
                             </span>
                         )}
                     </TabsTrigger>
-                    <TabsTrigger value="nid" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                    <TabsTrigger value="nid" className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2">
                         <CreditCard className="h-4 w-4" />
                         <span className="hidden sm:inline">NID</span> Verifications
                         {pendingNids.length > 0 && (
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                             </span>
                         )}
                     </TabsTrigger>
-                    <TabsTrigger value="domains" className="rounded-lg font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm gap-2">
+                    <TabsTrigger value="domains" className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2">
                         <Globe className="h-4 w-4" />
                         Edu Domains
                     </TabsTrigger>
@@ -211,31 +211,31 @@ export default function AdminDashboard() {
                     {isLoading ? (
                         <div className="space-y-4">
                             {[1, 2].map(i => (
-                                <div key={i} className="w-full h-36 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
+                                <div key={i} className="w-full h-36 bg-slate-100 animate-pulse rounded-2xl" />
                             ))}
                         </div>
                     ) : pendingGuides.length === 0 ? (
-                        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <div className="text-center py-16 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                             <CheckCircle className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">All caught up!</h3>
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">All caught up!</h3>
                             <p className="text-slate-500">No pending guide verifications.</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {pendingGuides.map((guide) => (
-                                <Card key={guide.id} className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                                <Card key={guide.id} className="p-6 rounded-2xl border-slate-200">
                                     <div className="flex flex-col md:flex-row gap-4">
                                         {/* Guide Info */}
                                         <div className="flex items-start gap-4 flex-1">
                                             {guide.avatarUrl ? (
                                                 <img src={guide.avatarUrl} alt={guide.name} className="h-12 w-12 rounded-xl object-cover" />
                                             ) : (
-                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-lg">
+                                                <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg">
                                                     {guide.name?.charAt(0)}
                                                 </div>
                                             )}
                                             <div className="flex-1">
-                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{guide.name}</h3>
+                                                <h3 className="text-lg font-bold text-slate-900">{guide.name}</h3>
                                                 {guide.email && (
                                                     <p className="text-sm text-slate-500">{guide.email}</p>
                                                 )}
@@ -291,26 +291,26 @@ export default function AdminDashboard() {
                     {isLoading ? (
                         <div className="space-y-4">
                             {[1, 2].map(i => (
-                                <div key={i} className="w-full h-36 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
+                                <div key={i} className="w-full h-36 bg-slate-100 animate-pulse rounded-2xl" />
                             ))}
                         </div>
                     ) : pendingNids.length === 0 ? (
-                        <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <div className="text-center py-16 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                             <CheckCircle className="h-12 w-12 text-emerald-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">All caught up!</h3>
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">All caught up!</h3>
                             <p className="text-slate-500">No pending NID verifications.</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {pendingNids.map((nid) => (
-                                <Card key={nid.id} className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                                <Card key={nid.id} className="p-6 rounded-2xl border-slate-200">
                                     <div className="flex flex-col md:flex-row gap-4">
                                         <div className="flex items-start gap-4 flex-1">
-                                            <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-lg">
+                                            <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg">
                                                 {nid.displayName?.charAt(0) || "?"}
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{nid.displayName}</h3>
+                                                <h3 className="text-lg font-bold text-slate-900">{nid.displayName}</h3>
                                                 <p className="text-sm text-slate-500">{nid.email}</p>
                                                 {nid.nidUrl && (
                                                     <button
@@ -352,9 +352,9 @@ export default function AdminDashboard() {
 
                 {/* ─── Edu Domains Management Tab ──────────────── */}
                 <TabsContent value="domains" className="mt-0">
-                    <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800">
+                    <Card className="p-6 rounded-2xl border-slate-200">
                         <div className="mb-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Accepted Edu Email Domains</h3>
+                            <h3 className="text-lg font-bold text-slate-900 mb-1">Accepted Edu Email Domains</h3>
                             <p className="text-sm text-slate-500">
                                 Guides who sign up with an email from these domains are auto-verified (no admin review needed).
                                 Others must upload a Student ID for manual verification.
@@ -391,9 +391,9 @@ export default function AdminDashboard() {
                                 {eduDomains.map((domain) => (
                                     <div
                                         key={domain}
-                                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 group"
+                                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 group"
                                     >
-                                        <code className="text-sm text-slate-700 dark:text-slate-300">{domain}</code>
+                                        <code className="text-sm text-slate-700">{domain}</code>
                                         <button
                                             onClick={() => handleRemoveDomain(domain)}
                                             className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all p-1 rounded-lg hover:bg-red-50"
@@ -406,7 +406,7 @@ export default function AdminDashboard() {
                         )}
 
                         {/* Save button */}
-                        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                             <p className="text-xs text-slate-400">{eduDomains.length} domain{eduDomains.length !== 1 ? "s" : ""} configured</p>
                             <Button
                                 onClick={handleSaveDomains}

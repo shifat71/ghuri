@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents, useMap } from "react-leaflet";
@@ -53,7 +53,7 @@ function MapEvents({ onAdd }: { onAdd: (lat: number, lng: number, label: string)
     });
 
     return isGeocoding ? (
-        <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-slate-900 p-2 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 flex items-center gap-2 text-[10px] font-bold">
+        <div className="absolute top-4 right-4 z-[1000] bg-white p-2 rounded-xl shadow-lg border border-slate-200 flex items-center gap-2 text-[10px] font-bold">
             <Loader2 className="h-3 w-3 animate-spin text-teal-600" />
             Identifying Location...
         </div>
@@ -142,7 +142,7 @@ export default function LeafletMapPicker({ spots, onChange }: MapPickerProps) {
             center={spots.length > 0 ? [spots[spots.length-1].lat, spots[spots.length-1].lng] : defaultCenter}
             zoom={spots.length > 0 ? 16 : 13}
             style={{ height: "500px", width: "100%", borderRadius: "1.5rem" }}
-            className="z-0 border-2 border-slate-100 dark:border-slate-800 shadow-inner"
+            className="z-0 border-2 border-slate-100 shadow-inner"
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

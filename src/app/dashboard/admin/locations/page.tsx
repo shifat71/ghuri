@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -80,7 +80,7 @@ export default function AdminLocationsPage() {
         <div className="max-w-5xl space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Location Management</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Location Management</h1>
                     <p className="text-slate-500">Manage the official list of destinations available on Ghuri.</p>
                 </div>
                 <Button onClick={handleSave} disabled={isSaving} className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 font-bold min-w-[150px]">
@@ -88,7 +88,7 @@ export default function AdminLocationsPage() {
                 </Button>
             </div>
 
-            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900/50">
+            <Card className="p-6 md:p-8 rounded-3xl border-slate-200 shadow-sm bg-white">
                 <div className="flex items-center justify-between mb-8">
                     <h3 className="font-bold text-xl flex items-center gap-2">
                         <MapPin className="h-5 w-5 text-indigo-600" />
@@ -105,10 +105,10 @@ export default function AdminLocationsPage() {
                             <p className="text-slate-500">No destinations configured.</p>
                         </div>
                     ) : destinations.map((dest) => (
-                        <div key={dest.id} className="grid md:grid-cols-12 gap-4 items-start p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl relative group">
+                        <div key={dest.id} className="grid md:grid-cols-12 gap-4 items-start p-4 bg-slate-50 border border-slate-100 rounded-2xl relative group">
                             
                             <div className="md:col-span-2">
-                                <div className="h-20 w-full bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden flex items-center justify-center relative">
+                                <div className="h-20 w-full bg-slate-200 rounded-xl overflow-hidden flex items-center justify-center relative">
                                     {dest.image ? (
                                         <img src={dest.image} alt={dest.name} className="h-full w-full object-cover" />
                                     ) : (
@@ -124,7 +124,7 @@ export default function AdminLocationsPage() {
                                         value={dest.name} 
                                         onChange={(e) => handleUpdate(dest.id, 'name', e.target.value)}
                                         placeholder="e.g. Sajek Valley"
-                                        className="h-10 bg-white dark:bg-slate-900 border-slate-200 shadow-sm rounded-lg" 
+                                        className="h-10 bg-white border-slate-200 shadow-sm rounded-lg" 
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -132,7 +132,7 @@ export default function AdminLocationsPage() {
                                     <select
                                         value={dest.category}
                                         onChange={(e) => handleUpdate(dest.id, 'category', e.target.value)}
-                                        className="flex h-10 w-full rounded-lg border-slate-200 shadow-sm bg-white dark:bg-slate-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                        className="flex h-10 w-full rounded-lg border-slate-200 shadow-sm bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                                     >
                                         <option value="City">City & Culture</option>
                                         <option value="Beach">Beach & Sea</option>
@@ -148,7 +148,7 @@ export default function AdminLocationsPage() {
                                             value={dest.image} 
                                             onChange={(e) => handleUpdate(dest.id, 'image', e.target.value)}
                                             placeholder="https://..."
-                                            className="h-10 bg-white dark:bg-slate-900 border-slate-200 shadow-sm rounded-lg flex-1" 
+                                            className="h-10 bg-white border-slate-200 shadow-sm rounded-lg flex-1" 
                                         />
                                         <Button 
                                             variant="ghost" 

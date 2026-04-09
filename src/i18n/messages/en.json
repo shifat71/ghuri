@@ -10,6 +10,8 @@
     "logout": "Log out"
   },
   "Landing": {
+    "destinations": "Destinations",
+    "findGuide": "Find a Guide",
     "heroTitle1": "Hire Verified ",
     "heroTitle2": "Student Talent",
     "heroSubtitle": "Connect with top university students for travel guiding, photography, tech support, and everyday tasks. Reliable, affordable, and 100% verified.",

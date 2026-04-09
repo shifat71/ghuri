@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -59,7 +59,7 @@ export default function CustomerProfilePage() {
     return (
         <div className="max-w-2xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Profile Settings</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Profile Settings</h1>
                 <p className="text-slate-500">Manage your personal information and travel preferences.</p>
             </div>
 
@@ -77,26 +77,26 @@ export default function CustomerProfilePage() {
                 </div>
             </div>
 
-            <Card className="p-6 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+            <Card className="p-6 rounded-3xl border-slate-200 shadow-sm space-y-6">
                 <div className="space-y-4">
                     <h3 className="font-bold text-slate-500 text-xs uppercase tracking-wider">Personal Information</h3>
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Full Name</label>
+                            <label className="block text-sm font-bold text-slate-600 mb-1.5">Full Name</label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input value={displayName} onChange={e => setDisplayName(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="Your full name" />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Phone Number</label>
+                            <label className="block text-sm font-bold text-slate-600 mb-1.5">Phone Number</label>
                             <div className="relative">
                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="+880..." />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1.5">Your City</label>
+                            <label className="block text-sm font-bold text-slate-600 mb-1.5">Your City</label>
                             <div className="relative">
                                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input value={location} onChange={e => setLocation(e.target.value)} className="pl-10 h-11 rounded-xl" placeholder="Dhaka, Chittagong..." />
@@ -113,7 +113,7 @@ export default function CustomerProfilePage() {
                             <button key={pref} onClick={() => togglePref(pref)}
                                 className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${preferences.includes(pref)
                                     ? 'bg-teal-600 text-white border-teal-600 shadow-sm shadow-teal-600/20'
-                                    : 'bg-white dark:bg-slate-900 text-slate-600 border-slate-200 dark:border-slate-700 hover:border-teal-400'}`}>
+                                    : 'bg-white text-slate-600 border-slate-200 hover:border-teal-400'}`}>
                                 {pref}
                             </button>
                         ))}

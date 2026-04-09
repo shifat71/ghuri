@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +18,7 @@ const LeafletMapPicker = dynamic(
     () => import("@/components/maps/LeafletMapPicker"),
     { 
         ssr: false,
-        loading: () => <div className="h-[400px] w-full bg-slate-100 dark:bg-slate-800 animate-pulse rounded-3xl flex items-center justify-center font-bold text-slate-400">Loading Map Engine...</div>
+        loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-3xl flex items-center justify-center font-bold text-slate-400">Loading Map Engine...</div>
     }
 );
 
@@ -135,7 +135,7 @@ export default function GuideCalendarPage() {
     return (
         <div className="max-w-6xl space-y-8 pb-24">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Service Areas & Availability</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Service Areas & Availability</h1>
                 <p className="text-slate-500">Define where travelers can find you and pinpoint your primary meeting area.</p>
             </div>
 
@@ -143,7 +143,7 @@ export default function GuideCalendarPage() {
                 
                 <div className="space-y-8">
                     {/* Exact Location Section (The Map) */}
-                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden">
+                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 shadow-sm bg-white overflow-hidden">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-10 w-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center">
                                 <Navigation className="h-5 w-5 text-indigo-600" />
@@ -162,7 +162,7 @@ export default function GuideCalendarPage() {
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Selected Points ({spots.length})</p>
                                     <div className="flex flex-wrap gap-2">
                                         {spots.map((spot, i) => (
-                                            <div key={i} className="flex items-center gap-2 p-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-600 dark:text-slate-400 group">
+                                            <div key={i} className="flex items-center gap-2 p-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-600 group">
                                                 <MapPin className="h-3 w-3 text-teal-600 shrink-0" />
                                                 <span className="truncate max-w-[150px]">{spot.label}</span>
                                                 <X className="h-3 w-3 cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setSpots(prev => prev.filter((_, idx) => idx !== i))} />
@@ -175,7 +175,7 @@ export default function GuideCalendarPage() {
                     </Card>
 
                     {/* Regional Locations Section */}
-                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900/50">
+                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 shadow-sm bg-white">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-10 w-10 rounded-xl bg-teal-100 dark:bg-teal-950 flex items-center justify-center">
                                 <MapPin className="h-5 w-5 text-teal-600" />
@@ -195,7 +195,7 @@ export default function GuideCalendarPage() {
                                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                                             guideLocations.includes(loc)
                                                 ? "bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-teal-500"
+                                                : "bg-white text-slate-600 border-slate-200 hover:border-teal-500"
                                         }`}
                                     >
                                         {loc}
@@ -224,7 +224,7 @@ export default function GuideCalendarPage() {
                     </Card>
 
                     {/* Availability Section */}
-                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900/50">
+                    <Card className="p-6 md:p-8 rounded-[2.5rem] border-slate-200 shadow-sm bg-white">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-10 w-10 rounded-xl bg-teal-100 dark:bg-teal-950 flex items-center justify-center">
                                 <CalendarX2 className="h-5 w-5 text-teal-600" />
@@ -240,7 +240,7 @@ export default function GuideCalendarPage() {
                                 mode="multiple"
                                 selected={selectedDates}
                                 onSelect={setSelectedDates as any}
-                                className="rounded-3xl border bg-white dark:bg-slate-950 p-4 shadow-sm h-fit w-fit"
+                                className="rounded-3xl border bg-white p-4 shadow-sm h-fit w-fit"
                             />
                         </div>
                     </Card>
@@ -248,7 +248,7 @@ export default function GuideCalendarPage() {
 
                 {/* Sidebar Summary & Save */}
                 <div className="space-y-6">
-                    <Card className="p-8 rounded-[2.5rem] border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900 sticky top-6">
+                    <Card className="p-8 rounded-[2.5rem] border-slate-200 shadow-xl bg-white sticky top-6">
                         <h3 className="font-black text-xl mb-6 pb-4 border-b">Settings Overview</h3>
                         
                         <div className="space-y-6">
@@ -281,7 +281,7 @@ export default function GuideCalendarPage() {
 
                             <div className="space-y-3 pb-6">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available Days</p>
-                                <p className="text-3xl font-black text-slate-900 dark:text-white leading-none">{selectedDates.length}</p>
+                                <p className="text-3xl font-black text-slate-900 leading-none">{selectedDates.length}</p>
                             </div>
 
                             <Button 

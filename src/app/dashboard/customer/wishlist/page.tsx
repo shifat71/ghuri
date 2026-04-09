@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,20 +49,20 @@ export default function CustomerWishlistPage() {
     return (
         <div className="max-w-4xl space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Wishlist</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Wishlist</h1>
                 <p className="text-slate-500">Your saved guides, ready to book when inspiration strikes.</p>
             </div>
 
             {savedGuides.length === 0 ? (
-                <Card className="p-16 text-center rounded-3xl border-dashed border-slate-200 dark:border-slate-700">
+                <Card className="p-16 text-center rounded-3xl border-dashed border-slate-200">
                     <Heart className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                    <p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Your wishlist is empty</p>
+                    <p className="font-bold text-slate-700 mb-1">Your wishlist is empty</p>
                     <p className="text-sm text-slate-500">Save guides from the Explore page by clicking the heart icon.</p>
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {savedGuides.map(guide => (
-                        <Card key={guide.id} className="p-5 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 items-start">
+                        <Card key={guide.id} className="p-5 rounded-3xl border-slate-200 shadow-sm flex gap-4 items-start">
                             <div className="h-16 w-16 rounded-2xl bg-teal-100 shrink-0 flex items-center justify-center overflow-hidden">
                                 {guide.avatarUrl
                                     ? <img src={guide.avatarUrl} alt={guide.name} className="h-full w-full object-cover" />
