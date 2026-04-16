@@ -61,9 +61,9 @@ export default function Home() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-[0.75rem] font-medium uppercase tracking-[0.2em] mb-8">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#76dd6d] animate-pulse" />
-                            Nogori Verified Guides
+                        <span className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/90 text-[0.75rem] font-medium uppercase tracking-[0.25em] mb-8 shadow-2xl">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-200 animate-pulse shadow-[0_0_8px_rgba(253,230,138,0.8)]" />
+                            Verified Student Experts
                         </span>
                     </motion.div>
 
@@ -75,7 +75,7 @@ export default function Home() {
                         style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                     >
                         {t('heroTitle1')} <br className="hidden md:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-[#76dd6d] italic pr-4">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-50 via-amber-200/90 to-amber-500 pr-4 drop-shadow-sm">
                             {t('heroTitle2')}
                         </span>
                     </motion.h1>

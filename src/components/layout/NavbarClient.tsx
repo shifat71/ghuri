@@ -71,14 +71,8 @@ export function NavbarClient() {
                 className={`pointer-events-auto w-full max-w-5xl flex items-center justify-between px-6 py-2.5 rounded-full transition-all duration-500 ease-in-out ${navBackgroundClass}`}
             >
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <img src="/image-Photoroom.png" alt="Ghuri Logo" className="h-8 w-auto object-contain" />
-                    <span
-                        className={`text-xl font-extrabold tracking-tight transition-colors duration-500 ${logoColorClass}`}
-                        style={{ fontFamily: 'var(--font-headline, "Plus Jakarta Sans", sans-serif)' }}
-                    >
-                        Ghuri
-                    </span>
+                <Link href="/" className="flex items-center group">
+                    <img src="/image-Photoroom.png" alt="Ghuri Logo" className="h-12 w-auto object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105" />
                 </Link>
 
                 {/* Center nav — desktop */}
